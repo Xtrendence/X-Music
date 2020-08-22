@@ -1,0 +1,50 @@
+:root {
+	--shadow-dark:0 6px 10px rgba(40,40,40,0.2);
+	--shadow-darker:0 6px 10px rgba(40,40,40,0.4);
+	--font-family:"Helvetica Neue", "Lucida Grande", "Arial", "Verdana", "Tahoma", sans-serif;
+}
+html {
+	font-family:var(--font-family);
+}
+body {
+	background:rgb(245,245,245);
+	color:rgb(75,75,75);
+	margin:0;
+	padding:0;
+	overflow:hidden;
+}
+button, input {
+	border:none;
+	outline:none;
+	transition:background 0.25s, color 0.25s;
+}
+.noselect {
+	-webkit-user-select:none;
+	-khtml-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
+	outline:none;
+}
+.hidden {
+	display:none;
+	visibility:hidden;
+	position:absolute;
+	z-index:-1;
+}
+::-webkit-scrollbar {
+	display:block;
+	width:4px;
+	background:rgba(60,60,60,0);
+}
+::-webkit-scrollbar-thumb {
+	border-radius:5px;
+	background:rgb(150,150,150);
+}
+::-webkit-scrollbar-thumb:hover {
+	background:rgb(100,100,100);
+}
+::-webkit-scrollbar-track {
+	background:rgb(210,210,210);
+}
+

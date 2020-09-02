@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	let body = document.getElementsByTagName("body")[0];
 
+	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
+	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
+	let buttonQuit = document.getElementsByClassName("title-button quit")[0];
+
 	if(detectMobile()) {
 		body.id = "mobile";
 	}
@@ -16,6 +20,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 
 	getInfo();
+
+	buttonMinimize.addEventListener("click", function() {
+		minimizeApp();
+	});
+
+	buttonMaximize.addEventListener("click", function() {
+		maximizeApp();
+	});
+
+	buttonQuit.addEventListener("click", function() {
+		quitApp();
+	});
 
 	ipcRenderer.on("getInfo", function(error, res) {
 		ipAddress = res.ip;
@@ -26,6 +42,19 @@ document.addEventListener("DOMContentLoaded", function() {
 	function getInfo() {
 		ipcRenderer.send("getInfo");
 	}
+
+	function minimizeApp() {
+		ipcRenderer.send("minimizeApp");
+	}
+
+	function maximizeApp() {
+		ipcRenderer.send("maximizeApp");
+	}
+
+	function quitApp() {
+		ipcRenderer.send("quitApp");
+	}
+
 });
 
 // Replace all occurrences in a string.

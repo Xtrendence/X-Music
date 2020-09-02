@@ -7,7 +7,7 @@ html {
 	font-family:var(--font-family);
 }
 body {
-	background:rgb(40,40,40);
+	background:rgb(245,245,245);
 	color:rgb(75,75,75);
 	margin:0;
 	padding:0;
@@ -79,16 +79,16 @@ button, input {
 }
 .title-button svg {
 	fill:rgb(255,255,255);
-	width:24px;
-	height:24px;
+	width:75%;
+	height:75%;
 }
 .title-button.minimize {
 	top:4px;
 	right:76px;
 }
 .title-button.minimize svg {
-	width:20px;
-	height:20px;
+	width:62%;
+	height:62%;
 	margin-top:2px;
 }
 .title-button.maximize {
@@ -96,8 +96,8 @@ button, input {
 	right:40px;
 }
 .title-button.maximize svg {
-	width:20px;
-	height:20px;
+	width:62%;
+	height:62%;
 	margin-top:2px;
 }
 .title-button.quit {

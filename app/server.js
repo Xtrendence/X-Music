@@ -20,59 +20,80 @@ const dataDirectory = path.join(__dirname, "./data/");
 const settingsFile = dataDirectory + "settings.json";
 const playlistsFile = dataDirectory + "playlists.json";
 
-const { app, BrowserWindow, screen, ipcMain } = electron;
+if(!fs.existsSync(dataDirectory)) {
+	fs.mkdirSync(dataDirectory);
+}
+if(!fs.existsSync(settingsFile)) {
+	fs.writeFileSync(settingsFile, "");
+}
+if(!fs.existsSync(playlistsFile)) {
+	fs.writeFileSync(playlistsFile, "");
+}
+
+const { app, BrowserWindow, screen, ipcMain, dialog } = electron;
 
 app.requestSingleInstanceLock();
 app.name = "X:/Music";
 
 app.on("ready", function() {
-	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+	if(fs.existsSync(settingsFile) && fs.existsSync(playlistsFile)) {
+		const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-	let windowWidth = 1280;
-	let windowHeight = 720;
+		let windowWidth = 1280;
+		let windowHeight = 720;
 
-	if(width <= 1080 || height <= 620) {
-		windowWidth = width - 100;
-		windowHeight = height - 100;
-	}
-
-	const localWindow = new BrowserWindow({
-		width:windowWidth,
-		minWidth:700,
-		height:windowHeight,
-		minHeight:550,
-		resizable:true,
-		frame:false,
-		webPreferences: {
-			nodeIntegration:true
+		if(width <= 1080 || height <= 620) {
+			windowWidth = width - 100;
+			windowHeight = height - 100;
 		}
-	});
 
-	localWindow.loadURL("http://127.0.0.1:" + localPort);
+		const localWindow = new BrowserWindow({
+			width:windowWidth,
+			minWidth:1000,
+			height:windowHeight,
+			minHeight:550,
+			resizable:true,
+			frame:false,
+			transparent:true,
+			webPreferences: {
+				nodeIntegration:true
+			}
+		});
 
-	localExpress.set("view engine", "ejs");
-	localExpress.use("/assets", express.static("assets"));
-	localExpress.use(body_parser.urlencoded({ extended:true }));
-	localExpress.use(body_parser.json({ limit:"512mb" }));
+		localWindow.loadURL("http://127.0.0.1:" + localPort);
 
-	localExpress.get("/", (req, res) => {
-		res.render("index");
-	});
+		localExpress.set("view engine", "ejs");
+		localExpress.use("/assets", express.static("assets"));
+		localExpress.use(body_parser.urlencoded({ extended:true }));
+		localExpress.use(body_parser.json({ limit:"512mb" }));
 
-	ipcMain.on("getInfo", function(error, req) {
-		let info = { ip:ip.address(), localPort:localPort, appPort:appPort };
-		localWindow.webContents.send("getInfo", info);
-	});
+		localExpress.get("/", (req, res) => {
+			res.render("index");
+		});
 
-	ipcMain.on("minimizeApp", function(error, req) {
-		localWindow.minimize();
-	});
+		ipcMain.on("getInfo", function(error, req) {
+			let theme = "light";
+			if(electron.nativeTheme.shouldUseDarkColors) {
+				theme = "dark";
+			}
+			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme };
+			localWindow.webContents.send("getInfo", info);
+		});
 
-	ipcMain.on("maximizeApp", function(error, req) {
-		localWindow.isMaximized() ? localWindow.restore() : localWindow.maximize();
-	});
+		ipcMain.on("minimizeApp", function(error, req) {
+			localWindow.minimize();
+		});
 
-	ipcMain.on("quitApp", function(error, req) {
+		ipcMain.on("maximizeApp", function(error, req) {
+			localWindow.isMaximized() ? localWindow.restore() : localWindow.maximize();
+		});
+
+		ipcMain.on("quitApp", function(error, req) {
+			app.quit();
+		});
+	}
+	else {
+		dialog.showMessageBoxSync({ title:"Error", message:"Could not create the required user files." });
 		app.quit();
-	});
+	}
 });

@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	let ipAddress = "127.0.0.1";
 	let localPort = 1999;
 	let appPort = 1998;
+	let appTheme = "light";
 
 	let body = document.getElementsByTagName("body")[0];
+	let cssTheme = document.getElementsByClassName("css-theme")[0];
 
 	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
 	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
@@ -37,7 +39,18 @@ document.addEventListener("DOMContentLoaded", function() {
 		ipAddress = res.ip;
 		localPort = res.localPort;
 		appPort = res.appPort;
+		appTheme = res.theme;
+		setTheme(appTheme);
 	});
+
+	function setTheme(theme) {
+		if(theme === "light") {
+			cssTheme.setAttribute("href", "../assets/css/light.css");
+		}
+		else {
+			cssTheme.setAttribute("href", "../assets/css/dark.css");
+		}
+	}
 
 	function getInfo() {
 		ipcRenderer.send("getInfo");

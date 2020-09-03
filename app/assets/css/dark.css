@@ -1,11 +1,16 @@
 :root {
 	--blue-dark:rgb(10,15,35);
-	--blue-medium:rgb(30, 30, 45);
-	--blue-light:rgb(40, 40, 55);
+	--blue-medium:rgb(30,30,45);
+	--blue-light:rgb(40,40,55);
 	--blue-ligher:rgb(20,40,90);
+	--purple-dark:rgb(18,12,39);
+	--purple-medium:rgb(32,23,70);
+	--purple-light:rgb(55,37,89);
+	--purple-ligher:rgb(80,66,140);
 	--text-dark:rgb(230,230,230);
 	--text-medium:rgb(240,240,240);
 	--text-light:rgb(255,255,255);
+	--red:rgb(240,20,20);
 	--shadow-dark:0 0 10px rgba(0,0,0,0.2);
 	--shadow-darker:0 0 10px rgba(0,0,0,0.4);
 	--font-family:"Helvetica Neue", "Lucida Grande", "Arial", "Verdana", "Tahoma", sans-serif;
@@ -14,7 +19,7 @@ html {
 	font-family:var(--font-family);
 }
 body {
-	background:var(--blue-medium);
+	background:var(--purple-medium);
 	color:rgb(75,75,75);
 	margin:0;
 	padding:0;
@@ -79,7 +84,7 @@ button, input, svg {
 	padding:4px;
 	border-radius:50%;
 	overflow:hidden;
-	background:var(--blue-medium);
+	background:var(--purple-medium);
 	position:absolute;
 	height:28px;
 	width:28px;
@@ -97,7 +102,6 @@ button, input, svg {
 .title-button.diagnostics svg {
 	width:70%;
 	height:70%;
-	margin-top:3px;
 }
 .title-button.minimize {
 	right:78px;
@@ -118,18 +122,15 @@ button, input, svg {
 .title-button.quit {
 	right:6px;
 }
-.title-button.quit svg {
-	margin-top:2px;
-}
 #desktop .title-button:hover {
-	background:var(--blue-dark);
+	background:var(--purple-dark);
 }
 #desktop .title-button.quit:hover {
-	background:rgb(240,20,20);
+	background:var(--red);
 }
 
 .sidebar {
-	background:var(--blue-dark);
+	background:var(--purple-dark);
 	width:200px;
 	height:calc(100% - 40px);
 	padding-top:40px;
@@ -151,7 +152,7 @@ button, input, svg {
 	color:var(--text-light);
 }
 #desktop .sidebar-button:hover, .sidebar-button.active {
-	background:var(--blue-light)
+	background:var(--purple-light)
 }
 .sidebar-button svg {
 	fill:var(--text-light);
@@ -178,9 +179,9 @@ button, input, svg {
 	scroll-behavior:smooth;
 	width:calc(100% - 200px);
 	height:calc(100% - 40px);
-	background:var(--blue-medium);
-	background:linear-gradient(270deg, var(--blue-medium) 0%, var(--blue-dark) 100%);
-	background:-webkit-linear-gradient(270deg, var(--blue-medium) 0%, var(--blue-dark) 100%);
+	background:var(--purple-medium);
+	background:linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
+	background:-webkit-linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 }
 .list-item {
 	display:block;
@@ -190,9 +191,9 @@ button, input, svg {
 	position:relative;
 	overflow:hidden;
 	border-radius:10px;
-	background:var(--blue-dark);
-	background:linear-gradient(0deg, var(--blue-dark) 35%, var(--blue-light) 100%);
-	background:-webkit-linear-gradient(0deg, var(--blue-dark) 35%, var(--blue-light) 100%);
+	background:var(--purple-dark);
+	background:linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
+	background:-webkit-linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
 	box-shadow:var(--shadow-darker);
 }
 .list-item:first-of-type {

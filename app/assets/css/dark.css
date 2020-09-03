@@ -122,6 +122,9 @@ button, input, svg {
 .title-button.quit {
 	right:6px;
 }
+.title-button.quit svg {
+	margin-top:2px;
+}
 #desktop .title-button:hover {
 	background:var(--purple-dark);
 }

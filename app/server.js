@@ -95,7 +95,7 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("quitApp", function(error, req) {
-			app.quit();
+			(process.platform === "darwin") ? app.hide() : app.quit();
 		});
 	}
 	else {

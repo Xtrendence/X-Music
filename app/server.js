@@ -85,7 +85,13 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("maximizeApp", function(error, req) {
-			localWindow.isMaximized() ? localWindow.restore() : localWindow.maximize();
+			if(process.platform === "darwin") {
+				localWindow.isFullScreen() ? localWindow.setFullScreen(false) : localWindow.setFullScreen(true);
+			}
+			else {
+				localWindow.isMaximized() ? localWindow.restore() : localWindow.maximize();
+			}
+
 		});
 
 		ipcMain.on("quitApp", function(error, req) {

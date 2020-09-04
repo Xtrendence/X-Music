@@ -24,7 +24,12 @@ if(!fs.existsSync(dataDirectory)) {
 	fs.mkdirSync(dataDirectory);
 }
 if(!fs.existsSync(settingsFile)) {
-	fs.writeFileSync(settingsFile, "");
+	let defaultSettings = JSON.stringify({
+		libraryDirectory:"",
+		showArt:false,
+		allowRemote:true
+	});
+	fs.writeFileSync(settingsFile, defaultSettings);
 }
 if(!fs.existsSync(playlistsFile)) {
 	fs.writeFileSync(playlistsFile, "");
@@ -37,6 +42,9 @@ app.name = "X:/Music";
 
 app.on("ready", function() {
 	if(fs.existsSync(settingsFile) && fs.existsSync(playlistsFile)) {
+		let settings = fs.readFileSync(settingsFile, { encoding:"utf-8" });
+		let playlists = fs.readFileSync(playlistsFile, { encoding:"utf-8" });
+
 		const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
 		let windowWidth = 1280;
@@ -76,7 +84,7 @@ app.on("ready", function() {
 			if(electron.nativeTheme.shouldUseDarkColors) {
 				theme = "dark";
 			}
-			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme };
+			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme, settings:settings, playlists:playlists };
 			localWindow.webContents.send("getInfo", info);
 		});
 

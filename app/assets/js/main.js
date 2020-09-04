@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	let localPort = 1999;
 	let appPort = 1998;
 	let appTheme = "light";
+	let libraryDirectory = "";
 
 	let body = document.getElementsByTagName("body")[0];
 	let cssTheme = document.getElementsByClassName("css-theme")[0];
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		localPort = res.localPort;
 		appPort = res.appPort;
 		appTheme = res.theme;
+		libraryDirectory = JSON.parse(res.settings).libraryDirectory;
 		setTheme(appTheme);
 	});
 

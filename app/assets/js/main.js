@@ -31,10 +31,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
 
+	let divListview = document.getElementsByClassName("listview")[0];
+	let divAudioPlayer = document.getElementsByClassName("audio-player")[0];
+	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
+
 	let audioFile = document.getElementsByClassName("audio-file")[0];
 
-	let divListview = document.getElementsByClassName("listview")[0];
-	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
+	let svgPlay = divAudioPlayer.getElementsByClassName("play-icon")[0];
+	let svgPause = divAudioPlayer.getElementsByClassName("pause-icon")[0];
 
 	if(detectMobile()) {
 		body.id = "mobile";
@@ -101,9 +105,23 @@ document.addEventListener("DOMContentLoaded", () => {
 	inputSearch.addEventListener("keydown", () => {
 		searchSong(inputSearch.value);
 	});
-	
+
 	inputSearch.addEventListener("keyup", () => {
 		searchSong(inputSearch.value);
+	});
+
+	svgPlay.addEventListener("click", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+			audioFile.play();
+			showPause();
+		}
+	});
+
+	svgPause.addEventListener("click", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+			audioFile.pause();
+			showPlay();
+		}
 	});
 
 	ipcRenderer.on("getInfo", (error, res) => {
@@ -142,6 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.src = "data:" + res.mime + ";base64," + res.base64;
 		audioFile.load();
 		audioFile.play();
+		divListview.classList.add("active");
+		divAudioPlayer.classList.remove("hidden");
+		showPause();
 	});
 
 	function setTheme(theme) {
@@ -190,6 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
 				elements[i].style.display = "block";
 			}
 		}
+	}
+
+	function showPause() {
+		svgPlay.classList.add("hidden");
+		svgPause.classList.remove("hidden");
+	}
+	function showPlay() {
+		svgPause.classList.add("hidden");
+		svgPlay.classList.remove("hidden");
 	}
 
 	function minimizeApp() {

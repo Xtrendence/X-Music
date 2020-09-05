@@ -192,13 +192,14 @@ button, input, svg {
 
 .listview, .settings-wrapper {
 	position:absolute;
-	z-index:90;
+	z-index:91;
 	top:40px;
 	right:0;
 	overflow-x:hidden;
 	overflow-y:scroll;
 	-webkit-overflow-scrolling:touch;
 	scroll-behavior:smooth;
+	box-shadow:var(--shadow-darker);
 	width:calc(100% - 200px);
 	height:calc(100% - 40px);
 	background:var(--purple-medium);
@@ -206,7 +207,7 @@ button, input, svg {
 	background:-webkit-linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 }
 .listview.active {
-	height:calc(100% - 40px - 100px);
+	height:calc(100% - 40px - 80px);
 }
 .list-item {
 	display:block;
@@ -276,6 +277,27 @@ button, input, svg {
 }
 .list-item svg:nth-of-type(2) {
 	right:10px;
+}
+
+.audio-player {
+	position:absolute;
+	z-index:90;
+	bottom:0;
+	right:0;
+	height:80px;
+	width:calc(100% - 200px);
+	background:var(--blue-medium);
+}
+.audio-player svg {
+	fill:var(--text-light);
+	width:30px;
+	height:30px;
+	position:absolute;
+	bottom:25px;
+	left:calc(50% - 30px / 2);
+}
+#desktop .audio-player svg:hover {
+	fill:var(--text-darker);
 }
 
 .settings-wrapper {

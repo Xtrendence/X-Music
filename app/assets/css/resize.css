@@ -1,0 +1,8 @@
+@media screen and (max-width:940px) {
+	.list-item .title {
+		width:calc(100% - 150px - 60px - 100px - 200px);
+	}
+	.list-item .album {
+		display:none;
+	}
+}

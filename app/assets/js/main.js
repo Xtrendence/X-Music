@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonDisableRemote = document.getElementsByClassName("input-choice disable-remote")[0];
 	let buttonResetSettings = document.getElementsByClassName("input-button reset-settings")[0];
 
+	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
 
 	let audioFile = document.getElementsByClassName("audio-file")[0];
@@ -97,6 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipcRenderer.send("resetSettings");
 	});
 
+	inputSearch.addEventListener("keydown", () => {
+		searchSong(inputSearch.value);
+	});
+	
+	inputSearch.addEventListener("keyup", () => {
+		searchSong(inputSearch.value);
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
@@ -105,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(validJSON(res.settings)) {
 			let settings = JSON.parse(res.settings);
 			inputLibraryDirectory.value = settings.libraryDirectory;
-			console.log(settings);
 		}
 		setTheme(appTheme);
 	});
@@ -155,6 +163,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
+	}
+
+	function searchSong(query) {
+		if(query !== "" && query.trim() !== "") {
+			showAll();
+			query = query.toLowerCase();
+			let elements = document.getElementsByClassName("list-item");
+			for(let i = 0; i < elements.length; i++) {
+				let element = elements[i];
+				let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
+				let album = element.getElementsByClassName("album")[0].textContent.toLowerCase();
+				let artist = element.getElementsByClassName("artist")[0].textContent.toLowerCase();
+				if(!title.includes(query) && !album.includes(query) && !artist.includes(query)) {
+					element.style.display = "none";
+				}
+			}
+		}
+		else {
+			showAll();
+		}
+
+		function showAll() {
+			let elements = document.getElementsByClassName("list-item");
+			for(let i = 0; i < elements.length; i++) {
+				elements[i].style.display = "block";
+			}
+		}
 	}
 
 	function minimizeApp() {

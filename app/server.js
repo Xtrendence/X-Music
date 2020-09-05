@@ -62,7 +62,7 @@ app.on("ready", function() {
 			minHeight:550,
 			resizable:true,
 			frame:false,
-			transparent:true,
+			transparent:false,
 			webPreferences: {
 				nodeIntegration:true
 			}
@@ -99,7 +99,6 @@ app.on("ready", function() {
 			else {
 				localWindow.isMaximized() ? localWindow.restore() : localWindow.maximize();
 			}
-
 		});
 
 		ipcMain.on("quitApp", function(error, req) {

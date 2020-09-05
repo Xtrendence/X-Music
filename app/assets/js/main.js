@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonResetSettings = document.getElementsByClassName("input-button reset-settings")[0];
 
 	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
+	let inputSlider = document.getElementsByClassName("audio-slider")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
 
 	let divListview = document.getElementsByClassName("listview")[0];
@@ -124,6 +125,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	audioFile.addEventListener("timeupdate", () => {
+		inputSlider.value = audioFile.currentTime;
+		inputSlider.setAttribute("value", audioFile.currentTime);
+		if(inputSlider.getAttribute("value") >= audioFile.duration) {
+			inputSlider.setAttribute("value", Math.floor(audioFile.duration));
+			inputSlider.setAttribute("max", Math.floor(audioFile.duration));
+			showPlay();
+		}
+	});
+
+	inputSlider.addEventListener("change", () => {
+		audioFile.currentTime = inputSlider.value;
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
@@ -184,6 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
+		inputSlider.setAttribute("max", song.duration);
 	}
 
 	function searchSong(query) {

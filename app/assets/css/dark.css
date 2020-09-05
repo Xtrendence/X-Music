@@ -214,19 +214,32 @@ button, input, svg {
 }
 .list-item .title {
 	font-weight:bold;
-	width:calc(100% - 150px - 60px - 100px - 200px);
+	width:calc(100% - 150px - 60px - 100px - 200px - 150px - 60px);
 	overflow:hidden;
 	white-space:nowrap;
 	text-overflow:ellipsis;
 	padding-right:60px;
 	margin-left:40px;
 }
+.list-item .album {
+	width:150px;
+	padding-right:60px;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
 .list-item .artist {
 	width:150px;
 	padding-right:60px;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 }
 .list-item .duration {
 	width:100px;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 }
 .list-item svg {
 	fill:var(--text-light);

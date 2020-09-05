@@ -104,17 +104,17 @@ app.on("ready", function() {
 						files.map(file => {
 							metadata.parseFile(file).then(data => {
 								let title = data.common.title;
-								let artist = "";
-								let album = "";
+								let artist = data.common.artist;
+								let album = data.common.album;
 								let duration = data.format.duration;
 								if(typeof data.common.title === "undefined") {
 									title = path.basename(file).split(".").slice(0, -1).join(".");
 								}
-								if(typeof data.common.artist === "undefined") {
-									artist = "Unknown Artist";
+								if(typeof data.common.album === "undefined") {
+									album = "Unknown Album";
 								}
 								if(typeof data.common.artist === "undefined") {
-									album = "Unknown Album";
+									artist = "Unknown Artist";
 								}
 								songs[file] = { title:title, artist:artist, album:album, duration:duration };
 								count++;

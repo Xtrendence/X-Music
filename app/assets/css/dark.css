@@ -47,18 +47,18 @@ button, input, svg {
 }
 ::-webkit-scrollbar {
 	display:block;
-	width:4px;
-	background:var(--blue-dark);
+	width:12px;
+	background:none;
 }
 ::-webkit-scrollbar-thumb {
-	border-radius:5px;
+	border-radius:4px;
 	background:var(--text-light);
 }
 ::-webkit-scrollbar-thumb:hover {
-	background:var(--blue-lighter);
+	background:var(--text-darker);
 }
 ::-webkit-scrollbar-track {
-	background:var(--blue-medium);
+	background:none;
 }
 
 .titlebar {
@@ -210,10 +210,14 @@ button, input, svg {
 	font-size:16px;
 	color:var(--text-light);
 	display:inline-block;
+	vertical-align:top;
 }
 .list-item .title {
 	font-weight:bold;
-	width:200px;
+	width:calc(100% - 150px - 60px - 100px - 200px);
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 	padding-right:60px;
 	margin-left:40px;
 }
@@ -276,7 +280,7 @@ button, input, svg {
 }
 .input-field {
 	display:inline-block;
-	width:calc(100% - 250px);
+	width:calc(100% - 200px);
 	padding:0 10px 0 10px;
 	margin-top:20px;
 	margin-right:10px;
@@ -295,6 +299,7 @@ button, input, svg {
 	display:inline-block;
 	padding:0 20px 0 20px;
 	margin-top:20px;
+	margin-right:10px;
 	height:40px;
 	border-radius:10px;
 	vertical-align:top;
@@ -305,9 +310,6 @@ button, input, svg {
 }
 #desktop .input-button:hover, #desktop .input-choice:hover {
 	background:var(--purple-medium);
-}
-.input-choice {
-	margin-right:10px;
 }
 .input-choice.active {
 	pointer-events:none;

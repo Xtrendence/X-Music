@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let appPort = 1998;
 	let appTheme = "light";
 	let libraryDirectory = "";
+	let songs = {};
 
 	let body = document.getElementsByTagName("body")[0];
 	let cssTheme = document.getElementsByClassName("css-theme")[0];
@@ -20,6 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonPlaylists = document.getElementsByClassName("sidebar-button playlists")[0];
 	let buttonSettings = document.getElementsByClassName("sidebar-button settings")[0];
 
+	let buttonBrowse = document.getElementsByClassName("input-button browse")[0];
+	let buttonEnableArtwork = document.getElementsByClassName("input-choice enable-artwork")[0];
+	let buttonDisableArtwork = document.getElementsByClassName("input-choice disable-artwork")[0];
+	let buttonEnableRemote = document.getElementsByClassName("input-choice enable-remote")[0];
+	let buttonDisableRemote = document.getElementsByClassName("input-choice disable-remote")[0];
+	let buttonResetSettings = document.getElementsByClassName("input-button reset-settings")[0];
+
+	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
+
 	let divListview = document.getElementsByClassName("listview")[0];
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
 
@@ -31,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	getInfo();
+	getSongs();
 
 	buttonMinimize.addEventListener("click", () => {
 		minimizeApp();
@@ -60,15 +71,56 @@ document.addEventListener("DOMContentLoaded", () => {
 		showPage("settings");
 	});
 
+	buttonBrowse.addEventListener("click", () => {
+		ipcRenderer.send("browseFiles");
+	});
+
+	buttonEnableArtwork.addEventListener("click", () => {
+
+	});
+
+	buttonDisableArtwork.addEventListener("click", () => {
+
+	});
+
+	buttonEnableRemote.addEventListener("click", () => {
+
+	});
+
+	buttonDisableRemote.addEventListener("click", () => {
+
+	});
+
+	buttonResetSettings.addEventListener("click", () => {
+		ipcRenderer.send("resetSettings");
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
 		appPort = res.appPort;
 		appTheme = res.theme;
 		if(validJSON(res.settings)) {
-			libraryDirectory = JSON.parse(res.settings).libraryDirectory;
+			let settings = JSON.parse(res.settings);
+			inputLibraryDirectory.value = settings.libraryDirectory;
+			console.log(settings);
 		}
 		setTheme(appTheme);
+	});
+
+	ipcRenderer.on("getSongs", (error, res) => {
+		songs = res;
+		divListview.innerHTML = "";
+		let files = Object.keys(songs);
+		for(let i = 0; i < files.length; i++) {
+			let file = files[i];
+			let song = songs[file];
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.id = file;
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + moment.utc(song.duration * 1000).format("HH:mm:ss") + '</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
+			divListview.appendChild(element);
+		}
 	});
 
 	function setTheme(theme) {
@@ -82,6 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function getInfo() {
 		ipcRenderer.send("getInfo");
+	}
+
+	function getSongs() {
+		ipcRenderer.send("getSongs");
 	}
 
 	function minimizeApp() {

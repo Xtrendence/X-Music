@@ -24,6 +24,7 @@
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "ip": "^1.1.5",
+    "mime-types": "^2.1.27",
     "music-metadata": "^7.0.2"
   },
   "devDependencies": {}

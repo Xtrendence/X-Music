@@ -14,6 +14,7 @@ const ip = require("ip");
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
+const mime = require("mime-types");
 const glob = require("glob");
 const metadata = require("music-metadata");
 const body_parser = require("body-parser");
@@ -83,7 +84,7 @@ app.on("ready", function() {
 			res.render("index");
 		});
 
-		ipcMain.on("getInfo", function(error, req) {
+		ipcMain.on("getInfo", (error, req) => {
 			if(electron.nativeTheme.shouldUseDarkColors) {
 				theme = "dark";
 			}
@@ -91,7 +92,7 @@ app.on("ready", function() {
 			localWindow.webContents.send("getInfo", info);
 		});
 
-		ipcMain.on("getSongs", function(error, req) {
+		ipcMain.on("getSongs", (error, req) => {
 			if(validJSON(settings)) {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
 				glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
@@ -130,12 +131,22 @@ app.on("ready", function() {
 			}
 		});
 
-		ipcMain.on("browseFiles",function(error, req) {
+		ipcMain.on("playSong", (error, req) => {
+			let type = mime.lookup(req).toLowerCase();
+			if(type === "audio/mpeg" || type === "audio/x-wav" || type === "audio/ogg" || type === "application/ogg") {
+				fs.readFile(req, function(error, file) {
+					let base64 = Buffer.from(file).toString("base64");
+					localWindow.webContents.send("playSong", { base64:base64, mime:type });
+				});
+			}
+		});
+
+		ipcMain.on("browseFiles",(error, req) => {
 			let directory = dialog.showOpenDialogSync(localWindow, { title:"Select Music Library Directory", message:"Select the directory that contains your MP3, WAV, or OGG files.", properties:["openDirectory"] });
 			changeSettings("libraryDirectory", directory[0]);
 		});
 
-		ipcMain.on("resetSettings", function(error, req) {
+		ipcMain.on("resetSettings", (error, req) => {
 			fs.writeFile(settingsFile, defaultSettings, function(error) {
 				if(error) {
 					console.log(error);
@@ -148,11 +159,11 @@ app.on("ready", function() {
 			});
 		});
 
-		ipcMain.on("minimizeApp", function(error, req) {
+		ipcMain.on("minimizeApp", (error, req) => {
 			localWindow.minimize();
 		});
 
-		ipcMain.on("maximizeApp", function(error, req) {
+		ipcMain.on("maximizeApp", (error, req) => {
 			if(process.platform === "darwin") {
 				localWindow.isFullScreen() ? localWindow.setFullScreen(false) : localWindow.setFullScreen(true);
 			}
@@ -161,7 +172,7 @@ app.on("ready", function() {
 			}
 		});
 
-		ipcMain.on("quitApp", function(error, req) {
+		ipcMain.on("quitApp", (error, req) => {
 			(process.platform === "darwin") ? app.hide() : app.quit();
 		});
 

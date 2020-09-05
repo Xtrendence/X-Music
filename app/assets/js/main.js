@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
 
+	let audioFile = document.getElementsByClassName("audio-file")[0];
+
 	let divListview = document.getElementsByClassName("listview")[0];
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
 
@@ -118,9 +120,20 @@ document.addEventListener("DOMContentLoaded", () => {
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.id = file;
-			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + moment.utc(song.duration * 1000).format("HH:mm:ss").replace("Invalid date", "-") + '</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
+			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + moment.utc(song.duration * 1000).format("HH:mm:ss").replace("Invalid date", "-") + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
+			let playIcon = element.getElementsByClassName("play-icon")[0];
+			let moreIcon = element.getElementsByClassName("more-icon")[0];
+			playIcon.addEventListener("click", () => {
+				playSong(file, song);
+			});
 		}
+	});
+
+	ipcRenderer.on("playSong", (error, res) => {
+		audioFile.src = "data:" + res.mime + ";base64," + res.base64;
+		audioFile.load();
+		audioFile.play();
 	});
 
 	function setTheme(theme) {
@@ -138,6 +151,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function getSongs() {
 		ipcRenderer.send("getSongs");
+	}
+
+	function playSong(file, song) {
+		ipcRenderer.send("playSong", file);
 	}
 
 	function minimizeApp() {

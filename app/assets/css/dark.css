@@ -190,6 +190,9 @@ button, input, svg {
 	background:linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 	background:-webkit-linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 }
+.listview.active {
+	height:calc(100% - 40px - 100px);
+}
 .list-item {
 	display:block;
 	width:calc(100% - 40px - 40px);

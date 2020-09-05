@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
 	const electron = require("electron");
 	const { ipcRenderer } = electron;
 
@@ -15,6 +15,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
 	let buttonQuit = document.getElementsByClassName("title-button quit")[0];
 
+	let buttonSongs = document.getElementsByClassName("sidebar-button songs")[0];
+	let buttonAlbums = document.getElementsByClassName("sidebar-button albums")[0];
+	let buttonPlaylists = document.getElementsByClassName("sidebar-button playlists")[0];
+	let buttonSettings = document.getElementsByClassName("sidebar-button settings")[0];
+
+	let divListview = document.getElementsByClassName("listview")[0];
+	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
+
 	if(detectMobile()) {
 		body.id = "mobile";
 	}
@@ -24,24 +32,42 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	getInfo();
 
-	buttonMinimize.addEventListener("click", function() {
+	buttonMinimize.addEventListener("click", () => {
 		minimizeApp();
 	});
 
-	buttonMaximize.addEventListener("click", function() {
+	buttonMaximize.addEventListener("click", () => {
 		maximizeApp();
 	});
 
-	buttonQuit.addEventListener("click", function() {
+	buttonQuit.addEventListener("click", () => {
 		quitApp();
 	});
 
-	ipcRenderer.on("getInfo", function(error, res) {
+	buttonSongs.addEventListener("click", () => {
+		showPage("songs");
+	});
+
+	buttonAlbums.addEventListener("click", () => {
+		showPage("albums");
+	});
+
+	buttonPlaylists.addEventListener("click", () => {
+		showPage("playlists");
+	});
+
+	buttonSettings.addEventListener("click", () => {
+		showPage("settings");
+	});
+
+	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
 		appPort = res.appPort;
 		appTheme = res.theme;
-		libraryDirectory = JSON.parse(res.settings).libraryDirectory;
+		if(validJSON(res.settings)) {
+			libraryDirectory = JSON.parse(res.settings).libraryDirectory;
+		}
 		setTheme(appTheme);
 	});
 
@@ -70,11 +96,47 @@ document.addEventListener("DOMContentLoaded", function() {
 		ipcRenderer.send("quitApp");
 	}
 
+	function showPage(page) {
+		buttonSongs.classList.remove("active");
+		buttonAlbums.classList.remove("active");
+		buttonPlaylists.classList.remove("active");
+		buttonSettings.classList.remove("active");
+
+		divListview.style.display = "none";
+		divSettingsWrapper.style.display = "none";
+
+		if(page === "songs" || page === "albums" || page === "playlists") {
+			divListview.style.display = "block";
+		}
+		else {
+			divSettingsWrapper.style.display = "block";
+		}
+
+		document.getElementsByClassName("sidebar-button " + page)[0].classList.add("active");
+	}
 });
 
 // Replace all occurrences in a string.
 String.prototype.replaceAll = function(str1, str2, ignore) {
 	return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+}
+
+function empty(string) {
+	if(string !== null && typeof string !== "undefined" && string.toString().trim() !== "" && JSON.stringify(string) !== "" && JSON.stringify(string) !== "{}") {
+		return false;
+	}
+	return true;
+}
+
+function validJSON(json) {
+	try {
+		let object = JSON.parse(json);
+		if(object && typeof object === "object") {
+			return object;
+		}
+	}
+	catch(e) { }
+	return false;
 }
 
 // Detect whether or not the user is on a mobile browser.

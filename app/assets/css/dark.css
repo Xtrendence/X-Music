@@ -166,9 +166,6 @@ button, input, svg {
 #desktop .sidebar-button:hover, .sidebar-button.active {
 	background:var(--purple-light)
 }
-.sidebar-button.active {
-	pointer-events:none;
-}
 .sidebar-button svg {
 	fill:var(--text-light);
 	width:28px;
@@ -298,10 +295,14 @@ button, input, svg {
 	position:relative;
 	overflow:hidden;
 	border-radius:10px;
+	transition:opacity 0.25s;
 	background:var(--purple-dark);
 	background:linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
 	background:-webkit-linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
 	box-shadow:var(--shadow-darker);
+}
+#desktop .block-item:hover {
+	opacity:0.75;
 }
 .block-item svg {
 	width:50%;

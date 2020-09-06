@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		divListview.innerHTML = "";
 	}
 
-	function listSongs() {
+	function listSongs(songs) {
 		let files = Object.keys(songs);
 		for(let i = 0; i < files.length; i++) {
 			let file = files[i];
@@ -288,6 +288,14 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.classList.add("album");
 			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 152a104 104 0 1 0 104 104 104 104 0 0 0-104-104zm0 128a24 24 0 1 1 24-24 24 24 0 0 1-24 24zm0-272C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 376a128 128 0 1 1 128-128 128 128 0 0 1-128 128z"/></svg><span class="title">' + name + '</span><span class="artist">' + album.artist + '</span>';
 			divListview.appendChild(element);
+
+			element.addEventListener("click", () => {
+				let albumSongs = {};
+				for(let i = 0; i < album.songs.length; i++) {
+					albumSongs[album.songs[i]] = songs[album.songs[i]];
+				}
+				showPage("songs", { songs:albumSongs });
+			});
 		}
 
 		if(Object.keys(albums).length === 0) {
@@ -433,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipcRenderer.send("quitApp");
 	}
 
-	function showPage(page) {
+	function showPage(page, args) {
 		buttonSongs.classList.remove("active");
 		buttonAlbums.classList.remove("active");
 		buttonArtists.classList.remove("active");
@@ -450,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			switch(page) {
 				case "songs":
-					listSongs();
+					(typeof args !== "undefined" && typeof args.songs !== "undefined") ? listSongs(args.songs) : listSongs(songs);
 					break;
 				case "albums":
 					listAlbums();

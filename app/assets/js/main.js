@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let appPort = 1998;
 	let appTheme = "light";
 	let libraryDirectory = "";
+	let currentSong = "";
 	let songs = {};
 
 	let body = document.getElementsByTagName("body")[0];
@@ -40,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let svgPlay = divAudioPlayer.getElementsByClassName("play-icon")[0];
 	let svgPause = divAudioPlayer.getElementsByClassName("pause-icon")[0];
+	let svgPrevious = divAudioPlayer.getElementsByClassName("previous-icon")[0];
+	let svgNext = divAudioPlayer.getElementsByClassName("next-icon")[0];
 
 	let spanAudioBanner = document.getElementsByClassName("audio-banner")[0];
 	let spanTimePassed = document.getElementsByClassName("audio-duration time-passed")[0];
@@ -129,6 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	svgPrevious.addEventListener("click", () => {
+		playPreviousSong();
+	});
+
+	svgNext.addEventListener("click", () => {
+		playNextSong();
+	});
+
 	audioFile.addEventListener("timeupdate", () => {
 		inputSlider.value = audioFile.currentTime;
 		inputSlider.setAttribute("value", audioFile.currentTime);
@@ -206,9 +217,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
+		currentSong = file;
 		spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
 		inputSlider.setAttribute("max", song.duration);
 		spanTimeTotal.textContent = formatSeconds(song.duration);
+	}
+
+	function playPreviousSong() {
+		let files = Object.keys(songs);
+		let current = files.indexOf(currentSong);
+		let previous = current - 1;
+		playSong(files[previous], songs[files[previous]]);
+	}
+
+	function playNextSong() {
+		let files = Object.keys(songs);
+		let current = files.indexOf(currentSong);
+		let next = current + 1;
+		playSong(files[next], songs[files[next]]);
 	}
 
 	function searchSong(query) {

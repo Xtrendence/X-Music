@@ -25,6 +25,7 @@ const playlistsFile = dataDirectory + "playlists.json";
 
 let defaultSettings = JSON.stringify({
 	libraryDirectory:"",
+	loop:"none",
 	showArt:false,
 	allowRemote:true
 });
@@ -150,6 +151,12 @@ app.on("ready", function() {
 			let directory = dialog.showOpenDialogSync(localWindow, { title:"Select Music Library Directory", message:"Select the directory that contains your MP3, WAV, or OGG files.", properties:["openDirectory"] });
 			if(typeof directory !== "undefined") {
 				changeSettings("libraryDirectory", directory[0]);
+			}
+		});
+
+		ipcMain.on("loopSetting", (error, req) => {
+			if(["none", "list", "song"].includes(req)) {
+				changeSettings("loop", req);
 			}
 		});
 

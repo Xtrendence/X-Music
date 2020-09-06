@@ -367,6 +367,34 @@ button, input, svg {
 	height:26px;
 	bottom:27px;
 }
+.audio-player .loop-icon {
+	right:175px;
+	fill:var(--text-light);
+	opacity:0.5;
+}
+.audio-player .loop-icon.loop-list {
+	fill:var(--text-light);
+	opacity:1;
+}
+.audio-player .loop-icon.loop-song {
+	fill:var(--purple-lighter);
+	opacity:1;
+}
+.audio-player .loop-indicator {
+	position:absolute;
+	color:var(--text-light);
+	font-weight:bold;
+	font-size:18px;
+	display:block;
+	width:20px;
+	height:20px;
+	border-radius:50%;
+	overflow:hidden;
+	text-align:center;
+	background:var(--blue-light);
+	right:190px;
+	bottom:40px;
+}
 .audio-player .previous-icon {
 	right:125px;
 }

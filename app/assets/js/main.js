@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let appPort = 1998;
 	let appTheme = "light";
 	let libraryDirectory = "";
+	let loop = "none";
 
 	let currentSong = "";
 
@@ -49,12 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let svgPlay = divAudioPlayer.getElementsByClassName("play-icon")[0];
 	let svgPause = divAudioPlayer.getElementsByClassName("pause-icon")[0];
+	let svgLoop = divAudioPlayer.getElementsByClassName("loop-icon")[0];
 	let svgPrevious = divAudioPlayer.getElementsByClassName("previous-icon")[0];
 	let svgNext = divAudioPlayer.getElementsByClassName("next-icon")[0];
 
 	let spanAudioBanner = document.getElementsByClassName("audio-banner")[0];
 	let spanTimePassed = document.getElementsByClassName("audio-duration time-passed")[0];
 	let spanTimeTotal = document.getElementsByClassName("audio-duration time-total")[0];
+	let spanLoopIndicator = document.getElementsByClassName("loop-indicator")[0];
 
 	if(detectMobile()) {
 		body.id = "mobile";
@@ -151,6 +154,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	svgLoop.addEventListener("click", () => {
+		if(svgLoop.classList.contains("loop-list")) {
+			ipcRenderer.send("loopSetting", "song");
+		}
+		else if(svgLoop.classList.contains("loop-song")) {
+			ipcRenderer.send("loopSetting", "none");
+		}
+		else {
+			ipcRenderer.send("loopSetting", "list");
+		}
+	});
+
 	svgPrevious.addEventListener("click", () => {
 		playPreviousSong();
 	});
@@ -187,11 +202,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(validJSON(res.settings)) {
 			let settings = JSON.parse(res.settings);
 			inputLibraryDirectory.value = settings.libraryDirectory;
+			if(libraryDirectory !== settings.libraryDirectory) {
+				libraryDirectory = settings.libraryDirectory;
+				getSongs();
+			}
+			loop = settings.loop;
+			svgLoop.setAttribute("class", "loop-icon");
+			svgLoop.classList.add("loop-" + settings.loop);
+			if(settings.loop === "song") {
+				spanLoopIndicator.classList.remove("hidden");
+			}
+			else {
+				spanLoopIndicator.classList.add("hidden");
+			}
 			settings.showArt ? buttonEnableArtwork.classList.add("active") : buttonDisableArtwork.classList.add("active");
 			settings.allowRemote ? buttonEnableRemote.classList.add("active") : buttonDisableRemote.classList.add("active");
 		}
 		setTheme(appTheme);
-		getSongs();
 	});
 
 	ipcRenderer.on("getSongs", (error, res) => {

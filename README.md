@@ -1,4 +1,4 @@
-# This app is a work in progress. You can follow/track said progress [here](https://github.com/Xtrendence/X-Music/projects/1).
+# This app is a work in progress. You can follow/track said progress [here](https://github.com/Xtrendence/X-Music/projects/1?fullscreen=true).
 
 # X:/Music
 

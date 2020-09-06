@@ -95,19 +95,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	buttonEnableArtwork.addEventListener("click", () => {
-
+		ipcRenderer.send("showArtwork", true);
 	});
 
 	buttonDisableArtwork.addEventListener("click", () => {
-
+		ipcRenderer.send("showArtwork", false);
 	});
 
 	buttonEnableRemote.addEventListener("click", () => {
-
+		ipcRenderer.send("allowRemote", true);
 	});
 
 	buttonDisableRemote.addEventListener("click", () => {
-
+		ipcRenderer.send("allowRemote", false);
 	});
 
 	buttonResetSettings.addEventListener("click", () => {
@@ -165,9 +165,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		localPort = res.localPort;
 		appPort = res.appPort;
 		appTheme = res.theme;
+		buttonEnableArtwork.classList.remove("active");
+		buttonDisableArtwork.classList.remove("active");
+		buttonEnableRemote.classList.remove("active");
+		buttonDisableRemote.classList.remove("active");
 		if(validJSON(res.settings)) {
 			let settings = JSON.parse(res.settings);
 			inputLibraryDirectory.value = settings.libraryDirectory;
+			settings.showArt ? buttonEnableArtwork.classList.add("active") : buttonDisableArtwork.classList.add("active");
+			settings.allowRemote ? buttonEnableRemote.classList.add("active") : buttonDisableRemote.classList.add("active");
 		}
 		setTheme(appTheme);
 		getSongs();

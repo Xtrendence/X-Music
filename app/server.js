@@ -150,6 +150,18 @@ app.on("ready", function() {
 			}
 		});
 
+		ipcMain.on("showArtwork", (error, req) => {
+			if(typeof req === "boolean") {
+				changeSettings("showArt", req);
+			}
+		});
+
+		ipcMain.on("allowRemote", (error, req) => {
+			if(typeof req === "boolean") {
+				changeSettings("allowRemote", req);
+			}
+		});
+
 		ipcMain.on("resetSettings", (error, req) => {
 			fs.writeFile(settingsFile, defaultSettings, function(error) {
 				if(error) {

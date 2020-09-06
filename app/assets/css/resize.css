@@ -1,8 +1,28 @@
-@media screen and (max-width:940px) {
+@media screen and (max-width:1100px) {
 	.list-item .title {
-		width:calc(100% - 150px - 60px - 100px - 200px);
+		width:calc(100% - 150px - 60px - 100px - 200px - 100px);
+		padding-right:30px;
 	}
 	.list-item .album {
+		padding-right:30px;
+	}
+	.list-item .artist {
+		padding-right:30px;
+	}
+}
+@media screen and (max-width:990px) {
+	.list-item .title {
+		width:calc(100% - 150px - 60px - 100px - 150px);
+	}
+	.list-item .album {
+		display:none;
+	}
+}
+@media screen and (max-width:860px) {
+	.list-item .title {
+		width:calc(100% - 150px - 60px - 100px);
+	}
+	.list-item .duration {
 		display:none;
 	}
 }

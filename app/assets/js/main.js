@@ -41,6 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	let svgPlay = divAudioPlayer.getElementsByClassName("play-icon")[0];
 	let svgPause = divAudioPlayer.getElementsByClassName("pause-icon")[0];
 
+	let spanAudioBanner = document.getElementsByClassName("audio-banner")[0];
+	let spanTimePassed = document.getElementsByClassName("audio-duration time-passed")[0];
+	let spanTimeTotal = document.getElementsByClassName("audio-duration time-total")[0];
+
 	if(detectMobile()) {
 		body.id = "mobile";
 	}
@@ -128,9 +132,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	audioFile.addEventListener("timeupdate", () => {
 		inputSlider.value = audioFile.currentTime;
 		inputSlider.setAttribute("value", audioFile.currentTime);
+		spanTimePassed.textContent = formatSeconds(audioFile.currentTime);
 		if(inputSlider.getAttribute("value") >= audioFile.duration) {
 			inputSlider.setAttribute("value", Math.floor(audioFile.duration));
 			inputSlider.setAttribute("max", Math.floor(audioFile.duration));
+			spanTimePassed.textContent = spanTimeTotal.textContent;
 			showPlay();
 		}
 	});
@@ -161,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.id = file;
-			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + moment.utc(song.duration * 1000).format("HH:mm:ss").replace("Invalid date", "-") + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
+			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
 			let playIcon = element.getElementsByClassName("play-icon")[0];
 			let moreIcon = element.getElementsByClassName("more-icon")[0];
@@ -176,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.load();
 		audioFile.play();
 		divListview.classList.add("active");
+		spanAudioBanner.classList.remove("hidden");
 		divAudioPlayer.classList.remove("hidden");
 		showPause();
 	});
@@ -199,7 +206,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
+		spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
 		inputSlider.setAttribute("max", song.duration);
+		spanTimeTotal.textContent = formatSeconds(song.duration);
 	}
 
 	function searchSong(query) {
@@ -269,6 +278,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		document.getElementsByClassName("sidebar-button " + page)[0].classList.add("active");
 	}
 });
+
+function formatSeconds(seconds) {
+	return moment.utc(seconds * 1000).format("HH:mm:ss").replace("Invalid date", "-");
+}
 
 // Replace all occurrences in a string.
 String.prototype.replaceAll = function(str1, str2, ignore) {

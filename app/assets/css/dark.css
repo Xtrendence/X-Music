@@ -104,6 +104,14 @@ button, input, svg {
 	width:70%;
 	height:70%;
 }
+.title-button.refresh {
+	left:241px;
+}
+.title-button.refresh svg {
+	width:70%;
+	height:70%;
+	margin-top:2px;
+}
 .title-button.minimize {
 	right:78px;
 }

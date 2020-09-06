@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	let body = document.getElementsByTagName("body")[0];
 	let cssTheme = document.getElementsByClassName("css-theme")[0];
 
+	let buttonDiagnostics = document.getElementsByClassName("title-button diagnostics")[0];
+	let buttonRefresh = document.getElementsByClassName("title-button refresh")[0];
 	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
 	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
 	let buttonQuit = document.getElementsByClassName("title-button quit")[0];
@@ -57,6 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	getInfo();
+
+	buttonDiagnostics.addEventListener("click", () => {
+
+	});
+
+	buttonRefresh.addEventListener("click", () => {
+		getSongs();
+	});
 
 	buttonMinimize.addEventListener("click", () => {
 		minimizeApp();
@@ -181,21 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("getSongs", (error, res) => {
 		songs = res;
-		let files = Object.keys(songs);
-		for(let i = 0; i < files.length; i++) {
-			let file = files[i];
-			let song = songs[file];
-			let element = document.createElement("div");
-			element.classList.add("list-item");
-			element.id = file;
-			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
-			divListview.appendChild(element);
-			let playIcon = element.getElementsByClassName("play-icon")[0];
-			let moreIcon = element.getElementsByClassName("more-icon")[0];
-			playIcon.addEventListener("click", () => {
-				playSong(file, song);
-			});
-		}
+		showPage("songs");
 	});
 
 	ipcRenderer.on("playSong", (error, res) => {
@@ -226,6 +222,42 @@ document.addEventListener("DOMContentLoaded", () => {
 		divListview.innerHTML = "";
 	}
 
+	function listSongs() {
+		let files = Object.keys(songs);
+		for(let i = 0; i < files.length; i++) {
+			let file = files[i];
+			let song = songs[file];
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.id = file;
+			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
+			divListview.appendChild(element);
+			let playIcon = element.getElementsByClassName("play-icon")[0];
+			let moreIcon = element.getElementsByClassName("more-icon")[0];
+			playIcon.addEventListener("click", () => {
+				playSong(file, song);
+			});
+		}
+		if(files.length === 0) {
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Songs Found...</span>';
+			divListview.appendChild(element);
+		}
+	}
+
+	function listAlbums() {
+
+	}
+
+	function listArtists() {
+
+	}
+
+	function listPlaylists() {
+
+	}
+
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
 		currentSong = file;
@@ -252,15 +284,27 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(query !== "" && query.trim() !== "") {
 			showAll();
 			query = query.toLowerCase();
-			let elements = document.getElementsByClassName("list-item");
-			for(let i = 0; i < elements.length; i++) {
-				let element = elements[i];
-				let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
-				let album = element.getElementsByClassName("album")[0].textContent.toLowerCase();
-				let artist = element.getElementsByClassName("artist")[0].textContent.toLowerCase();
-				if(!title.includes(query) && !album.includes(query) && !artist.includes(query)) {
-					element.style.display = "none";
+			let activePage = document.getElementsByClassName("sidebar-button active")[0];
+			if(activePage.classList.contains("songs")) {
+				let elements = document.getElementsByClassName("list-item");
+				for(let i = 0; i < elements.length; i++) {
+					let element = elements[i];
+					let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
+					let album = element.getElementsByClassName("album")[0].textContent.toLowerCase();
+					let artist = element.getElementsByClassName("artist")[0].textContent.toLowerCase();
+					if(!title.includes(query) && !album.includes(query) && !artist.includes(query)) {
+						element.style.display = "none";
+					}
 				}
+			}
+			else if(activePage.classList.contains("albums")) {
+
+			}
+			else if(activePage.classList.contains("artists")) {
+
+			}
+			else if(activePage.classList.contains("playlists")) {
+
 			}
 		}
 		else {
@@ -308,9 +352,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		if(page === "songs" || page === "albums" || page === "artists" || page === "playlists") {
 			divListview.style.display = "block";
+			divListview.innerHTML = "";
+			inputSearch.classList.remove("hidden");
+
+			switch(page) {
+				case "songs":
+					listSongs();
+					break;
+				case "albums":
+					listAlbums();
+					break;
+				case "artists":
+					listArtists();
+					break;
+				case "playlists":
+					listPlaylists();
+					break;
+			}
 		}
 		else {
 			divSettingsWrapper.style.display = "block";
+			inputSearch.classList.add("hidden");
 		}
 
 		document.getElementsByClassName("sidebar-button " + page)[0].classList.add("active");

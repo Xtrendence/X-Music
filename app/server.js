@@ -130,6 +130,9 @@ app.on("ready", function() {
 						}
 					});
 				}
+				else {
+					localWindow.webContents.send("getSongs", "");
+				}
 			}
 		});
 

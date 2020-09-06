@@ -7,8 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	let appPort = 1998;
 	let appTheme = "light";
 	let libraryDirectory = "";
+
 	let currentSong = "";
+
 	let songs = {};
+	let albums = {};
+	let artists = {};
+	let playlists = {};
 
 	let body = document.getElementsByTagName("body")[0];
 	let cssTheme = document.getElementsByClassName("css-theme")[0];
@@ -241,21 +246,109 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(files.length === 0) {
 			let element = document.createElement("div");
 			element.classList.add("list-item");
+			element.classList.add("error");
 			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Songs Found...</span>';
 			divListview.appendChild(element);
 		}
 	}
 
 	function listAlbums() {
+		if(Object.keys(albums).length === 0) {
+			let files = Object.keys(songs);
+			for(let i = 0; i < files.length; i++) {
+				let file = files[i];
+				let song = songs[file];
 
+				let artist = "Unknown Artist";
+				if(typeof song.artist !== "undefined") {
+					artist = song.artist.trim();
+				}
+
+				let album = "Unknown Album";
+				if(typeof song.album !== "undefined") {
+					album = song.album.trim();
+				}
+
+				if(album in albums) {
+					albums[album]["songs"].push(file);
+				}
+				else {
+					albums[album] = { artist:artist, songs:[file] };
+				}
+			}
+		}
+
+		let names = Object.keys(albums);
+		for(let i = 0; i < names.length; i ++) {
+			let name = names[i];
+			let album = albums[names[i]];
+			let element = document.createElement("div");
+			element.id = name;
+			element.classList.add("block-item");
+			element.classList.add("album");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 152a104 104 0 1 0 104 104 104 104 0 0 0-104-104zm0 128a24 24 0 1 1 24-24 24 24 0 0 1-24 24zm0-272C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 376a128 128 0 1 1 128-128 128 128 0 0 1-128 128z"/></svg><span class="title">' + name + '</span><span class="artist">' + album.artist + '</span>';
+			divListview.appendChild(element);
+		}
+
+		if(Object.keys(albums).length === 0) {
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.classList.add("error");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Albums Found...</span>';
+			divListview.appendChild(element);
+		}
 	}
 
 	function listArtists() {
+		if(Object.keys(artists).length === 0) {
+			let files = Object.keys(songs);
+			for(let i = 0; i < files.length; i++) {
+				let file = files[i];
+				let song = songs[file];
 
+				let artist = "Unknown Artist";
+				if(typeof song.artist !== "undefined") {
+					artist = song.artist.trim();
+				}
+
+				if(artist in artists) {
+					artists[artist]["songs"].push(file);
+				}
+				else {
+					artists[artist] = { songs:[file] };
+				}
+			}
+		}
+
+		let names = Object.keys(artists);
+		for(let i = 0; i < names.length; i ++) {
+			let name = names[i];
+			let artist = artists[names[i]];
+			let element = document.createElement("div");
+			element.id = name;
+			element.classList.add("block-item");
+			element.classList.add("artist");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path d="M336 192h-16c-8.84 0-16 7.16-16 16v48c0 74.8-64.49 134.82-140.79 127.38C96.71 376.89 48 317.11 48 250.3V208c0-8.84-7.16-16-16-16H16c-8.84 0-16 7.16-16 16v40.16c0 89.64 63.97 169.55 152 181.69V464H96c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16h-56v-33.77C285.71 418.47 352 344.9 352 256v-48c0-8.84-7.16-16-16-16zM176 352c53.02 0 96-42.98 96-96h-85.33c-5.89 0-10.67-3.58-10.67-8v-16c0-4.42 4.78-8 10.67-8H272v-32h-85.33c-5.89 0-10.67-3.58-10.67-8v-16c0-4.42 4.78-8 10.67-8H272v-32h-85.33c-5.89 0-10.67-3.58-10.67-8v-16c0-4.42 4.78-8 10.67-8H272c0-53.02-42.98-96-96-96S80 42.98 80 96v160c0 53.02 42.98 96 96 96z"/></svg><span class="title">' + name + '</span>';
+			divListview.appendChild(element);
+		}
+
+		if(Object.keys(artists).length === 0) {
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.classList.add("error");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Artists Found...</span>';
+			divListview.appendChild(element);
+		}
 	}
 
 	function listPlaylists() {
-
+		if(Object.keys(playlists).length === 0) {
+			let element = document.createElement("div");
+			element.classList.add("list-item");
+			element.classList.add("error");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Playlists Found...</span>';
+			divListview.appendChild(element);
+		}
 	}
 
 	function playSong(file, song) {

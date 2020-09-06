@@ -1,3 +1,16 @@
+@media screen and (min-width:1100px) {
+	.block-item {
+		width:calc(100% / 3 - 40px - 40px);
+		height:calc((100vw - 200px) / 3 - 40px - 40px - 50px);
+	}
+}
+@media screen and (min-width:1280px) {
+	.block-item {
+		width:calc(100% / 4 - 40px - 40px);
+		height:calc((100vw - 200px) / 4 - 40px - 40px - 40px);
+	}
+}
+
 @media screen and (max-width:1100px) {
 	.list-item .title {
 		width:calc(100% - 150px - 60px - 100px - 200px - 100px);
@@ -24,5 +37,9 @@
 	}
 	.list-item .duration {
 		display:none;
+	}
+	.block-item {
+		width:calc(100% / 2 - 40px - 40px);
+		height:calc((100vw - 200px) / 2 - 40px - 40px - 40px);
 	}
 }

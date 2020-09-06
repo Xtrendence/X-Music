@@ -285,6 +285,47 @@ button, input, svg {
 .list-item svg:nth-of-type(2) {
 	right:10px;
 }
+.list-item.error .title {
+	width:calc(100% - 100px);
+}
+
+.block-item {
+	width:calc(100% / 3 - 40px - 40px);
+	height:calc((100vw - 200px) / 3 - 40px - 40px - 30px);
+	display:inline-block;
+	padding:20px;
+	margin:0 20px 20px 20px;
+	position:relative;
+	overflow:hidden;
+	border-radius:10px;
+	background:var(--purple-dark);
+	background:linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
+	background:-webkit-linear-gradient(120deg, var(--purple-dark) 35%, var(--purple-light) 100%);
+	box-shadow:var(--shadow-darker);
+}
+.block-item svg {
+	width:50%;
+	height:50%;
+	display:block;
+	margin:5px auto 20px auto;
+	fill:var(--text-light);
+}
+.block-item.artist svg {
+	margin-top:15px;
+}
+.block-item span {
+	color:var(--text-light);
+	display:block;
+	width:100%;
+	text-align:center;
+	line-height:30px;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+.block-item .title {
+	font-weight:bold;
+}
 
 .audio-banner {
 	position:absolute;

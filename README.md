@@ -18,4 +18,4 @@ The song's title, artist, album, and duration are read and displayed. To keep it
 
 It should be, yes. On the server-side, there aren't any shell commands or any user input that could be used to gain access to anything X:/Music shouldn't have access to. For security reasons, audio files cannot be deleted or modified in any way through the app. The only files X:/Music writes to are the "settings.json" and "playlists.json" files in the "data" directory. Besides that, X:/Music doesn't write data anywhere else on the OS, and as far as reading is concerned, only MP3, WAV, and OGG files are supported, so it shouldn't be possible to trick it into reading other file types unless the server-side code is modified. 
 
-![X:/Music](https://i.imgur.com/VRWKNES.png)
+![X:/Music](https://i.imgur.com/zwSGzjG.png)

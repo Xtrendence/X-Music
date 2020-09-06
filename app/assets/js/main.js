@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let buttonSongs = document.getElementsByClassName("sidebar-button songs")[0];
 	let buttonAlbums = document.getElementsByClassName("sidebar-button albums")[0];
+	let buttonArtists = document.getElementsByClassName("sidebar-button artists")[0];
 	let buttonPlaylists = document.getElementsByClassName("sidebar-button playlists")[0];
 	let buttonSettings = document.getElementsByClassName("sidebar-button settings")[0];
 
@@ -56,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	getInfo();
-	getSongs();
 
 	buttonMinimize.addEventListener("click", () => {
 		minimizeApp();
@@ -76,6 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	buttonAlbums.addEventListener("click", () => {
 		showPage("albums");
+	});
+
+	buttonArtists.addEventListener("click", () => {
+		showPage("artists");
 	});
 
 	buttonPlaylists.addEventListener("click", () => {
@@ -166,11 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			inputLibraryDirectory.value = settings.libraryDirectory;
 		}
 		setTheme(appTheme);
+		getSongs();
 	});
 
 	ipcRenderer.on("getSongs", (error, res) => {
 		songs = res;
-		divListview.innerHTML = "";
 		let files = Object.keys(songs);
 		for(let i = 0; i < files.length; i++) {
 			let file = files[i];
@@ -213,6 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function getSongs() {
 		ipcRenderer.send("getSongs");
+		divListview.innerHTML = "";
 	}
 
 	function playSong(file, song) {
@@ -288,13 +293,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	function showPage(page) {
 		buttonSongs.classList.remove("active");
 		buttonAlbums.classList.remove("active");
+		buttonArtists.classList.remove("active");
 		buttonPlaylists.classList.remove("active");
 		buttonSettings.classList.remove("active");
 
 		divListview.style.display = "none";
 		divSettingsWrapper.style.display = "none";
 
-		if(page === "songs" || page === "albums" || page === "playlists") {
+		if(page === "songs" || page === "albums" || page === "artists" || page === "playlists") {
 			divListview.style.display = "block";
 		}
 		else {

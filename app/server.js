@@ -95,39 +95,41 @@ app.on("ready", function() {
 		ipcMain.on("getSongs", (error, req) => {
 			if(validJSON(settings)) {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
-				glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
-					if(error) {
-						console.log(error);
-					}
-					else {
-						let songs = {};
-						let count = 0;
-						files.map(file => {
-							metadata.parseFile(file).then(data => {
-								let title = data.common.title;
-								let artist = data.common.artist;
-								let album = data.common.album;
-								let duration = data.format.duration;
-								if(typeof data.common.title === "undefined") {
-									title = path.basename(file).split(".").slice(0, -1).join(".");
-								}
-								if(typeof data.common.album === "undefined") {
-									album = "Unknown Album";
-								}
-								if(typeof data.common.artist === "undefined") {
-									artist = "Unknown Artist";
-								}
-								songs[file] = { title:title, artist:artist, album:album, duration:duration };
-								count++;
-								if(count === files.length) {
-									localWindow.webContents.send("getSongs", songs);
-								}
-							}).catch(error => {
-								console.log(error);
+				if(libraryDirectory !== "") {
+					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
+						if(error) {
+							console.log(error);
+						}
+						else {
+							let songs = {};
+							let count = 0;
+							files.map(file => {
+								metadata.parseFile(file).then(data => {
+									let title = data.common.title;
+									let artist = data.common.artist;
+									let album = data.common.album;
+									let duration = data.format.duration;
+									if(typeof data.common.title === "undefined") {
+										title = path.basename(file).split(".").slice(0, -1).join(".");
+									}
+									if(typeof data.common.album === "undefined") {
+										album = "Unknown Album";
+									}
+									if(typeof data.common.artist === "undefined") {
+										artist = "Unknown Artist";
+									}
+									songs[file] = { title:title, artist:artist, album:album, duration:duration };
+									count++;
+									if(count === files.length) {
+										localWindow.webContents.send("getSongs", songs);
+									}
+								}).catch(error => {
+									console.log(error);
+								});
 							});
-						});
-					}
-				});
+						}
+					});
+				}
 			}
 		});
 
@@ -143,7 +145,9 @@ app.on("ready", function() {
 
 		ipcMain.on("browseFiles",(error, req) => {
 			let directory = dialog.showOpenDialogSync(localWindow, { title:"Select Music Library Directory", message:"Select the directory that contains your MP3, WAV, or OGG files.", properties:["openDirectory"] });
-			changeSettings("libraryDirectory", directory[0]);
+			if(typeof directory !== "undefined") {
+				changeSettings("libraryDirectory", directory[0]);
+			}
 		});
 
 		ipcMain.on("resetSettings", (error, req) => {

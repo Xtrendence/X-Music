@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			query = query.toLowerCase();
 			let activePage = document.getElementsByClassName("sidebar-button active")[0];
 			if(activePage.classList.contains("songs")) {
-				let elements = document.getElementsByClassName("list-item");
+				let elements = document.getElementsByClassName("list-item song");
 				for(let i = 0; i < elements.length; i++) {
 					let element = elements[i];
 					let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
@@ -422,10 +422,25 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 			}
 			else if(activePage.classList.contains("albums")) {
-
+				let elements = document.getElementsByClassName("block-item album");
+				for(let i = 0; i < elements.length; i++) {
+					let element = elements[i];
+					let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
+					let artist = element.getElementsByClassName("artist")[0].textContent.toLowerCase();
+					if(!title.includes(query) && !artist.includes(query)) {
+						element.style.display = "none";
+					}
+				}
 			}
 			else if(activePage.classList.contains("artists")) {
-
+				let elements = document.getElementsByClassName("block-item artist");
+				for(let i = 0; i < elements.length; i++) {
+					let element = elements[i];
+					let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
+					if(!title.includes(query)) {
+						element.style.display = "none";
+					}
+				}
 			}
 			else if(activePage.classList.contains("playlists")) {
 
@@ -436,9 +451,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		function showAll() {
-			let elements = document.getElementsByClassName("list-item");
-			for(let i = 0; i < elements.length; i++) {
-				elements[i].style.display = "block";
+			let listElements = document.getElementsByClassName("list-item");
+			let blockElements = document.getElementsByClassName("block-item");
+			for(let i = 0; i < listElements.length; i++) {
+				listElements[i].style.display = "block";
+			}
+			for(let i = 0; i < blockElements.length; i++) {
+				blockElements[i].style.display = "inline-block";
 			}
 		}
 	}

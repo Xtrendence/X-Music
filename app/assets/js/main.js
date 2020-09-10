@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let spanTimePassed = document.getElementsByClassName("audio-duration time-passed")[0];
 	let spanTimeTotal = document.getElementsByClassName("audio-duration time-total")[0];
 	let spanLoopIndicator = document.getElementsByClassName("loop-indicator")[0];
+	let spanAudioFileCounter = document.getElementsByClassName("audio-file-counter")[0];
 
 	if(detectMobile()) {
 		body.id = "mobile";
@@ -220,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("getSongs", (error, res) => {
 		songs = res;
+		spanAudioFileCounter.textContent = "Files Found: " + Object.keys(songs).length;
 		showPage("songs");
 	});
 
@@ -285,6 +287,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			playIcon.addEventListener("click", () => {
 				playSong(file, song);
 			});
+
+			// TODO: Remove.
+			showPage("settings");
 		}
 
 		if(files.length === 0) {

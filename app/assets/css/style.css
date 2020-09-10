@@ -475,6 +475,18 @@ button, input, svg {
 	display:block;
 	color:var(--text-light);
 }
+.section-text {
+	font-size:16px;
+	display:block;
+	color:var(--text-dark);
+	margin-top:20px;
+	line-height:25px;
+}
+.section-text.audio-file-counter {
+	color:var(--text-light);
+	font-weight:bold;
+	line-height:18px;
+}
 .input-wrapper {
 	display:block;
 	font-size:0;

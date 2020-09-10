@@ -203,7 +203,7 @@ app.on("ready", function() {
 		});
 
 		function changeSettings(key, value) {
-			let currentSettings = fs.readFileSync(settingsFile, { encoding:"utf-8" });
+			let currentSettings = fs.readFileSync(settingsFile, { encoding:"utf-8" }).toString();
 			if(validJSON(currentSettings)) {
 				let current = JSON.parse(currentSettings);
 				current[key] = value;

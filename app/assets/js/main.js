@@ -287,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			let element = document.createElement("div");
 			element.classList.add("list-item");
+			element.classList.add("song");
 			element.id = file;
 			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
@@ -397,17 +398,21 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function playPreviousSong() {
-		let files = Object.keys(songs);
-		let current = files.indexOf(currentSong);
-		let previous = current - 1;
-		playSong(files[previous], songs[files[previous]]);
+		let listedSongs = document.getElementsByClassName("list-item song");
+		let previous = listedSongs[listedSongs.length - 1];
+		if(document.getElementById(currentSong).previousSibling !== null) {
+			previous = document.getElementById(currentSong).previousSibling;
+		}
+		playSong(previous.id, songs[previous.id]);
 	}
 
 	function playNextSong() {
-		let files = Object.keys(songs);
-		let current = files.indexOf(currentSong);
-		let next = current + 1;
-		playSong(files[next], songs[files[next]]);
+		let listedSongs = document.getElementsByClassName("list-item song");
+		let next = listedSongs[0];
+		if(document.getElementById(currentSong).nextSibling !== null) {
+			next = document.getElementById(currentSong).nextSibling;
+		}
+		playSong(next.id, songs[next.id]);
 	}
 
 	function searchSong(query) {

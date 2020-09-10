@@ -486,6 +486,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			inputSearch.classList.add("hidden");
 		}
 
+		divListview.scrollTop = 0;
+		divListview.scrollTo(0, 0);
+
 		document.getElementsByClassName("sidebar-button " + page)[0].classList.add("active");
 	}
 });

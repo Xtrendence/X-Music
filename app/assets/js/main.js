@@ -287,9 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			playIcon.addEventListener("click", () => {
 				playSong(file, song);
 			});
-
-			// TODO: Remove.
-			showPage("settings");
 		}
 
 		if(files.length === 0) {

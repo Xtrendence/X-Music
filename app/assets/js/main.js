@@ -30,8 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonSettings = document.getElementsByClassName("sidebar-button settings")[0];
 
 	let buttonBrowse = document.getElementsByClassName("input-button browse")[0];
-	let buttonEnableArtwork = document.getElementsByClassName("input-choice enable-artwork")[0];
-	let buttonDisableArtwork = document.getElementsByClassName("input-choice disable-artwork")[0];
 	let buttonEnableRemote = document.getElementsByClassName("input-choice enable-remote")[0];
 	let buttonDisableRemote = document.getElementsByClassName("input-choice disable-remote")[0];
 	let buttonResetSettings = document.getElementsByClassName("input-button reset-settings")[0];
@@ -111,14 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipcRenderer.send("browseFiles");
 	});
 
-	buttonEnableArtwork.addEventListener("click", () => {
-		ipcRenderer.send("showArtwork", true);
-	});
-
-	buttonDisableArtwork.addEventListener("click", () => {
-		ipcRenderer.send("showArtwork", false);
-	});
-
 	buttonEnableRemote.addEventListener("click", () => {
 		ipcRenderer.send("allowRemote", true);
 	});
@@ -193,8 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
 		appPort = res.appPort;
-		buttonEnableArtwork.classList.remove("active");
-		buttonDisableArtwork.classList.remove("active");
 		buttonEnableRemote.classList.remove("active");
 		buttonDisableRemote.classList.remove("active");
 		if(validJSON(res.settings)) {
@@ -214,7 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			else {
 				spanLoopIndicator.classList.add("hidden");
 			}
-			settings.showArt ? buttonEnableArtwork.classList.add("active") : buttonDisableArtwork.classList.add("active");
 			settings.allowRemote ? buttonEnableRemote.classList.add("active") : buttonDisableRemote.classList.add("active");
 		}
 	});
@@ -286,6 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			playIcon.addEventListener("click", () => {
 				playSong(file, song);
+			});
+
+			moreIcon.addEventListener("click", () => {
+
 			});
 		}
 

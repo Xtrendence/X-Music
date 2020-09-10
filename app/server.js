@@ -26,7 +26,6 @@ const playlistsFile = dataDirectory + "playlists.json";
 let defaultSettings = JSON.stringify({
 	libraryDirectory:"",
 	loop:"none",
-	showArt:false,
 	allowRemote:true
 });
 
@@ -157,12 +156,6 @@ app.on("ready", function() {
 		ipcMain.on("loopSetting", (error, req) => {
 			if(["none", "list", "song"].includes(req)) {
 				changeSettings("loop", req);
-			}
-		});
-
-		ipcMain.on("showArtwork", (error, req) => {
-			if(typeof req === "boolean") {
-				changeSettings("showArt", req);
 			}
 		});
 

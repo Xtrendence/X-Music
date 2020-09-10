@@ -47,7 +47,6 @@ app.name = "X:/Music";
 
 app.on("ready", function() {
 	if(fs.existsSync(settingsFile) && fs.existsSync(playlistsFile)) {
-		let theme = "light";
 		let settings = fs.readFileSync(settingsFile, { encoding:"utf-8" });
 		let playlists = fs.readFileSync(playlistsFile, { encoding:"utf-8" });
 
@@ -86,10 +85,7 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("getInfo", (error, req) => {
-			if(electron.nativeTheme.shouldUseDarkColors) {
-				theme = "dark";
-			}
-			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme, settings:settings, playlists:playlists };
+			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
 			localWindow.webContents.send("getInfo", info);
 		});
 
@@ -97,6 +93,10 @@ app.on("ready", function() {
 			if(validJSON(settings)) {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
 				if(libraryDirectory !== "") {
+					let watch = fs.watch(libraryDirectory, { recursive:true, persistent:true }, () => {
+						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:true };
+						localWindow.webContents.send("getInfo", info);
+					});
 					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
 						if(error) {
 							console.log(error);
@@ -179,7 +179,7 @@ app.on("ready", function() {
 				}
 				else {
 					settings = defaultSettings;
-					let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme, settings:settings, playlists:playlists };
+					let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
 					localWindow.webContents.send("getInfo", info);
 				}
 			});
@@ -213,7 +213,7 @@ app.on("ready", function() {
 					}
 					else {
 						settings = JSON.stringify(current);
-						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, theme:theme, settings:settings, playlists:playlists };
+						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
 						localWindow.webContents.send("getInfo", info);
 					}
 				});

@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	let ipAddress = "127.0.0.1";
 	let localPort = 1999;
 	let appPort = 1998;
-	let appTheme = "light";
 	let libraryDirectory = "";
 	let loop = "none";
 
@@ -17,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	let playlists = {};
 
 	let body = document.getElementsByTagName("body")[0];
-	let cssTheme = document.getElementsByClassName("css-theme")[0];
 
 	let buttonDiagnostics = document.getElementsByClassName("title-button diagnostics")[0];
 	let buttonRefresh = document.getElementsByClassName("title-button refresh")[0];
@@ -194,7 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
 		appPort = res.appPort;
-		appTheme = res.theme;
 		buttonEnableArtwork.classList.remove("active");
 		buttonDisableArtwork.classList.remove("active");
 		buttonEnableRemote.classList.remove("active");
@@ -202,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(validJSON(res.settings)) {
 			let settings = JSON.parse(res.settings);
 			inputLibraryDirectory.value = settings.libraryDirectory;
-			if(libraryDirectory !== settings.libraryDirectory) {
+			if(libraryDirectory !== settings.libraryDirectory || res.forceUpdate) {
 				hideAudioPlayer();
 				libraryDirectory = settings.libraryDirectory;
 				getSongs();
@@ -219,7 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			settings.showArt ? buttonEnableArtwork.classList.add("active") : buttonDisableArtwork.classList.add("active");
 			settings.allowRemote ? buttonEnableRemote.classList.add("active") : buttonDisableRemote.classList.add("active");
 		}
-		setTheme(appTheme);
 	});
 
 	ipcRenderer.on("getSongs", (error, res) => {
@@ -236,15 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		divAudioPlayer.classList.remove("hidden");
 		showPause();
 	});
-
-	function setTheme(theme) {
-		if(theme === "light") {
-			cssTheme.setAttribute("href", "../assets/css/light.css");
-		}
-		else {
-			cssTheme.setAttribute("href", "../assets/css/dark.css");
-		}
-	}
 
 	function getInfo() {
 		ipcRenderer.send("getInfo");

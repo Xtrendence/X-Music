@@ -14,7 +14,7 @@ Yes, you can. Through X:/Music's settings, you can change the location of your m
 
 ### Does X:/Music read and display the metadata of audio files?
 
-The song's title, artist, album, and duration are read and displayed. To keep it lightweight, and to ensure the UI's consistency, album artwork will not be displayed by default, though you can change this behavior in the settings section. Due to Node.js' limited number of libraries regarding the reading and writing of metadata, and complications with cross-platform compatibility, the metadata of audio files will not be editable, and will only be read/used in a very limited way.
+The song's title, artist, album, and duration are read and displayed. To keep it lightweight, and to ensure the UI's consistency, album artwork will not be displayed. Due to Node.js' limited number of libraries regarding the reading and writing of metadata, and complications with cross-platform compatibility, the metadata of audio files will not be editable, and will only be read/used in a very limited way.
 
 ### Is this secure?
 

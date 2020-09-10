@@ -259,17 +259,45 @@ document.addEventListener("DOMContentLoaded", () => {
 		for(let i = 0; i < files.length; i++) {
 			let file = files[i];
 			let song = songs[file];
+
+			let artist = "Unknown Artist";
+			if(typeof song.artist !== "undefined") {
+				artist = song.artist.trim();
+			}
+
+			if(artist in artists) {
+				artists[artist]["songs"].push(file);
+			}
+			else {
+				artists[artist] = { songs:[file] };
+			}
+
+			let album = "Unknown Album";
+			if(typeof song.album !== "undefined") {
+				album = song.album.trim();
+			}
+
+			if(album in albums) {
+				albums[album]["songs"].push(file);
+			}
+			else {
+				albums[album] = { artist:song.artist, songs:[file] };
+			}
+
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.id = file;
 			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
+
 			let playIcon = element.getElementsByClassName("play-icon")[0];
 			let moreIcon = element.getElementsByClassName("more-icon")[0];
+
 			playIcon.addEventListener("click", () => {
 				playSong(file, song);
 			});
 		}
+
 		if(files.length === 0) {
 			let element = document.createElement("div");
 			element.classList.add("list-item");
@@ -280,31 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function listAlbums() {
-		if(Object.keys(albums).length === 0) {
-			let files = Object.keys(songs);
-			for(let i = 0; i < files.length; i++) {
-				let file = files[i];
-				let song = songs[file];
-
-				let artist = "Unknown Artist";
-				if(typeof song.artist !== "undefined") {
-					artist = song.artist.trim();
-				}
-
-				let album = "Unknown Album";
-				if(typeof song.album !== "undefined") {
-					album = song.album.trim();
-				}
-
-				if(album in albums) {
-					albums[album]["songs"].push(file);
-				}
-				else {
-					albums[album] = { artist:artist, songs:[file] };
-				}
-			}
-		}
-
 		let names = Object.keys(albums);
 		for(let i = 0; i < names.length; i ++) {
 			let name = names[i];
@@ -335,26 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function listArtists() {
-		if(Object.keys(artists).length === 0) {
-			let files = Object.keys(songs);
-			for(let i = 0; i < files.length; i++) {
-				let file = files[i];
-				let song = songs[file];
-
-				let artist = "Unknown Artist";
-				if(typeof song.artist !== "undefined") {
-					artist = song.artist.trim();
-				}
-
-				if(artist in artists) {
-					artists[artist]["songs"].push(file);
-				}
-				else {
-					artists[artist] = { songs:[file] };
-				}
-			}
-		}
-
 		let names = Object.keys(artists);
 		for(let i = 0; i < names.length; i ++) {
 			let name = names[i];

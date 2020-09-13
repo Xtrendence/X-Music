@@ -180,6 +180,15 @@ app.on("ready", function() {
 			});
 		});
 
+		ipcMain.on("openFileLocation", (error, req) => {
+			if(validJSON(settings)) {
+				let libraryDirectory = JSON.parse(settings).libraryDirectory;
+				if(req.replaceAll("/", "\\").includes(libraryDirectory)) {
+					shell.showItemInFolder(path.resolve(req));
+				}
+			}
+		});
+
 		ipcMain.on("minimizeApp", (error, req) => {
 			localWindow.minimize();
 		});
@@ -196,6 +205,38 @@ app.on("ready", function() {
 		ipcMain.on("quitApp", (error, req) => {
 			(process.platform === "darwin") ? app.hide() : app.quit();
 		});
+
+		appExpress.set("view engine", "ejs");
+		appExpress.use("/assets", express.static("assets"));
+		appExpress.use(body_parser.urlencoded({ extended:true }));
+		appExpress.use(body_parser.json({ limit:"1mb" }));
+
+		appExpress.get("/", (req, res) => {
+			if(remoteCheck()) {
+				res.render("remote");
+			}
+		});
+
+		appExpress.post("/playSong", (req, res) => {
+
+		});
+
+		appExpress.get("/resumeSong", (req, res) => {
+			localWindow.webContents.send("resumeSong");
+		});
+
+		appExpress.get("/pauseSong", (req, res) => {
+			localWindow.webContents.send("pauseSong");
+		});
+
+		function remoteCheck() {
+			if(validJSON(settings)) {
+				return JSON.parse(settings).allowRemote;
+			}
+			else {
+				return true;
+			}
+		}
 
 		function changeSettings(key, value) {
 			let currentSettings = fs.readFileSync(settingsFile, { encoding:"utf-8" }).toString();
@@ -220,6 +261,10 @@ app.on("ready", function() {
 		app.quit();
 	}
 });
+
+String.prototype.replaceAll = function(str1, str2, ignore) {
+	return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+}
 
 function validJSON(json) {
 	try {

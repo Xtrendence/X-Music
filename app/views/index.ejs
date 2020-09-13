@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="../assets/css/style.css" class="css-theme">
+        <link rel="stylesheet" href="../assets/css/style.css">
         <link rel="stylesheet" href="../assets/css/resize.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <script src="../assets/js/moment.js"></script>
@@ -56,6 +56,15 @@
             </button>
         </div>
         <div class="listview noselect"></div>
+        <div class="more-menu hidden">
+            <button class="more-button close-menu">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"/></svg>
+            </button>
+            <button class="more-button play-song">Play Song</button>
+            <button class="more-button add-to-playlist">Add to Playlist...</button>
+            <button class="more-button remove-from-playlist hidden">Remove from Playlist</button>
+            <button class="more-button open-file-location">Open File Location</button>
+        </div>
         <span class="audio-banner hidden"></span>
         <div class="audio-player noselect hidden">
             <audio class="audio-file hidden"></audio>
@@ -77,12 +86,13 @@
                     <button class="input-button browse">Browse...</button>
                 </div>
                 <span class="section-text noselect audio-file-counter">Files Found: </span>
-                <span class="section-text noselect">Change the path to the directory that contains the audio files you wish to play with X:/Music. Use the "Browse..." button to navigate to the desired folder, and click on the "Select Folder" or "Open" button to select a directory as your music library.</span>
+                <span class="section-text noselect">Change the path to the directory that contains the audio files you wish to play with X:/Music. Use the "Browse..." button to navigate to the desired folder, and click on the "Select Folder" or "Open" button to select a directory as your music library. Only MP3, WAV, and OGG files are supported.</span>
             </div>
             <div class="section">
                 <span class="section-title noselect">Remote Access</span>
                 <button class="input-choice enable-remote">Enabled</button>
                 <button class="input-choice disable-remote">Disabled</button>
+                <span class="section-text remote-ip"></span>
                 <span class="section-text noselect">Enable or disable remote access which allows other devices on the same network to control the audio on the host device. Remotes cannot modify the host's settings, or gain access to the host's filesystem.</span>
             </div>
             <div class="section">

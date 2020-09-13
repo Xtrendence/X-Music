@@ -448,6 +448,46 @@ button, input, svg {
 	background:var(--purple-dark);
 }
 
+.more-menu {
+	position:absolute;
+	z-index:90;
+	right:40px;
+	top:50px;
+	width:auto;
+	height:40px;
+	font-size:0;
+	border-radius:10px;
+	overflow:hidden;
+	box-shadow:var(--shadow-darker);
+	background:var(--blue-light);
+}
+.more-button {
+	background:none;
+	font-size:18px;
+	color:var(--text-light);
+	font-weight:bold;
+	height:100%;
+	padding:0 20px 0 20px;
+	vertical-align:top;
+	display:inline-block;
+}
+#desktop .more-button:hover {
+	background:var(--purple-light);
+}
+.more-button:nth-of-type(1) {
+	background:var(--blue-medium);
+	padding:0 10px 0 10px;
+}
+.more-button:nth-of-type(3) {
+	background:var(--blue-medium);
+}
+.more-button svg {
+	fill:var(--text-light);
+	width:24px;
+	height:24px;
+	vertical-align:middle;
+}
+
 .settings-wrapper {
 	z-index:91;
 	font-size:0;

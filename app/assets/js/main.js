@@ -34,6 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonDisableRemote = document.getElementsByClassName("input-choice disable-remote")[0];
 	let buttonResetSettings = document.getElementsByClassName("input-button reset-settings")[0];
 
+	let buttonMoreClose = document.getElementsByClassName("more-button close-menu")[0];
+	let buttonMorePlaySong = document.getElementsByClassName("more-button play-song")[0];
+	let buttonMoreAddToPlaylist = document.getElementsByClassName("more-button add-to-playlist")[0];
+	let buttonMoreRemoveFromPlaylist = document.getElementsByClassName("more-button remove-from-playlist")[0];
+	let buttonMoreOpenFileLocation = document.getElementsByClassName("more-button open-file-location")[0];
+
 	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
 	let inputSlider = document.getElementsByClassName("audio-slider")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
@@ -41,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let divListview = document.getElementsByClassName("listview")[0];
 	let divAudioPlayer = document.getElementsByClassName("audio-player")[0];
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
+	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
 
 	let audioFile = document.getElementsByClassName("audio-file")[0];
 
@@ -55,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let spanTimeTotal = document.getElementsByClassName("audio-duration time-total")[0];
 	let spanLoopIndicator = document.getElementsByClassName("loop-indicator")[0];
 	let spanAudioFileCounter = document.getElementsByClassName("audio-file-counter")[0];
+	let spanRemoteIP = document.getElementsByClassName("remote-ip")[0];
 
 	if(detectMobile()) {
 		body.id = "mobile";
@@ -64,6 +72,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	getInfo();
+
+	document.addEventListener("click", (e) => {
+		let target = e.target;
+		let moreMenuExceptions = ["more-menu", "more-button", "more-icon", "more-path"];
+		let exception = false;
+		for(let i = 0; i < moreMenuExceptions.length; i++) {
+			if(target.classList.contains(moreMenuExceptions[i])) {
+				exception = true;
+			}
+		}
+		if(!exception) {
+			hideMoreMenu();
+		}
+	});
 
 	buttonDiagnostics.addEventListener("click", () => {
 
@@ -119,6 +141,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	buttonResetSettings.addEventListener("click", () => {
 		ipcRenderer.send("resetSettings");
+	});
+
+	buttonMoreClose.addEventListener("click", () => {
+		hideMoreMenu();
+	});
+
+	buttonMorePlaySong.addEventListener("click", () => {
+		let index = divMoreMenu.getAttribute("data-index");
+		let song = songs[index];
+		let file = song.file;
+		playSong(file, song);
+	});
+
+	buttonMoreAddToPlaylist.addEventListener("click", () => {
+
+	});
+
+	buttonMoreRemoveFromPlaylist.addEventListener("click", () => {
+
+	});
+
+	buttonMoreOpenFileLocation.addEventListener("click", () => {
+		let index = divMoreMenu.getAttribute("data-index");
+		let song = songs[index];
+		let file = song.file;
+		ipcRenderer.send("openFileLocation", file);
 	});
 
 	inputSearch.addEventListener("keydown", () => {
@@ -202,7 +250,16 @@ document.addEventListener("DOMContentLoaded", () => {
 			else {
 				spanLoopIndicator.classList.add("hidden");
 			}
-			settings.allowRemote ? buttonEnableRemote.classList.add("active") : buttonDisableRemote.classList.add("active");
+			if(settings.allowRemote) {
+				buttonEnableRemote.classList.add("active");
+				spanRemoteIP.textContent = "http://" + ipAddress + ":" + appPort;
+				spanRemoteIP.classList.remove("hidden");
+			}
+			else {
+				buttonDisableRemote.classList.add("active");
+				spanRemoteIP.textContent = "";
+				spanRemoteIP.classList.add("hidden");
+			}
 		}
 	});
 
@@ -221,6 +278,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		spanAudioBanner.classList.remove("hidden");
 		divAudioPlayer.classList.remove("hidden");
 		showPause();
+	});
+
+	ipcRenderer.on("resumeSong", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+			audioFile.play();
+			showPause();
+		}
+	});
+
+	ipcRenderer.on("pauseSong", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+			audioFile.pause();
+			showPlay();
+		}
 	});
 
 	function getInfo() {
@@ -269,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.classList.add("list-item");
 			element.classList.add("song");
 			element.id = song.file;
-			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
+			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path class="more-path" d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
 
 			let playIcon = element.getElementsByClassName("play-icon")[0];
@@ -280,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			});
 
 			moreIcon.addEventListener("click", () => {
-
+				showMoreMenu(element, index);
 			});
 		}
 
@@ -369,6 +440,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Playlists Found...</span>';
 			divListview.appendChild(element);
 		}
+	}
+
+	function showMoreMenu(element, index) {
+		divMoreMenu.style.top = element.offsetTop + 49 + "px";
+		divMoreMenu.classList.remove("hidden");
+		divMoreMenu.setAttribute("data-index", index);
+	}
+
+	function hideMoreMenu() {
+		divMoreMenu.classList.add("hidden");
+		divMoreMenu.removeAttribute("data-index");
+		divMoreMenu.removeAttribute("style");
 	}
 
 	function hideAudioPlayer() {

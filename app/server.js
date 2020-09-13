@@ -67,6 +67,8 @@ app.on("ready", function() {
 			resizable:true,
 			frame:false,
 			transparent:false,
+			x:100,
+			y:100,
 			webPreferences: {
 				nodeIntegration:true
 			}
@@ -101,7 +103,7 @@ app.on("ready", function() {
 							console.log(error);
 						}
 						else {
-							let songs = {};
+							let songs = [];
 							let count = 0;
 							files.map(file => {
 								metadata.parseFile(file).then(data => {
@@ -109,16 +111,16 @@ app.on("ready", function() {
 									let artist = data.common.artist;
 									let album = data.common.album;
 									let duration = data.format.duration;
-									if(typeof data.common.title === "undefined") {
+									if(typeof data.common.title === "undefined" || data.common.title.trim() === "") {
 										title = path.basename(file).split(".").slice(0, -1).join(".");
 									}
-									if(typeof data.common.album === "undefined") {
+									if(typeof data.common.album === "undefined" || data.common.album.trim() === "") {
 										album = "Unknown Album";
 									}
-									if(typeof data.common.artist === "undefined") {
+									if(typeof data.common.artist === "undefined" || data.common.artist.trim() === "") {
 										artist = "Unknown Artist";
 									}
-									songs[file] = { title:title, artist:artist, album:album, duration:duration };
+									songs.push({ file:file, title:title, artist:artist, album:album, duration:duration });
 									count++;
 									if(count === files.length) {
 										localWindow.webContents.send("getSongs", songs);

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let currentSong = "";
 
-	let songs = {};
+	let songs = [];
 	let albums = {};
 	let artists = {};
 	let playlists = {};
@@ -208,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("getSongs", (error, res) => {
 		songs = res;
+		sortSongs();
 		spanAudioFileCounter.textContent = "Files Found: " + Object.keys(songs).length;
 		showPage("songs");
 	});
@@ -232,10 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function listSongs(songs) {
-		let files = Object.keys(songs);
-		for(let i = 0; i < files.length; i++) {
-			let file = files[i];
-			let song = songs[file];
+		let keys = Object.keys(songs);
+		for(let i = 0; i < keys.length; i++) {
+			let index = keys[i];
+			let song = songs[index];
 
 			let artist = "Unknown Artist";
 			if(typeof song.artist !== "undefined") {
@@ -243,10 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 
 			if(artist in artists) {
-				artists[artist]["songs"].push(file);
+				artists[artist]["songs"].push(index);
 			}
 			else {
-				artists[artist] = { songs:[file] };
+				artists[artist] = { songs:[index] };
 			}
 
 			let album = "Unknown Album";
@@ -255,16 +256,19 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 
 			if(album in albums) {
-				albums[album]["songs"].push(file);
+				albums[album]["songs"].push(index);
+				if(albums[album].artist !== artist) {
+					albums[album].artist = "Multiple Artists";
+				}
 			}
 			else {
-				albums[album] = { artist:song.artist, songs:[file] };
+				albums[album] = { artist:song.artist, songs:[index] };
 			}
 
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.classList.add("song");
-			element.id = file;
+			element.id = song.file;
 			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
 
@@ -272,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			let moreIcon = element.getElementsByClassName("more-icon")[0];
 
 			playIcon.addEventListener("click", () => {
-				playSong(file, song);
+				playSong(song.file, song);
 			});
 
 			moreIcon.addEventListener("click", () => {
@@ -280,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			});
 		}
 
-		if(files.length === 0) {
+		if(keys.length === 0) {
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.classList.add("error");
@@ -289,11 +293,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	function sortSongs() {
+		songs.sort((a, b) => a.title.localeCompare(b.title));
+	}
+
+	function sortPlaylists() {
+
+	}
+
 	function listAlbums() {
-		let names = Object.keys(albums);
-		for(let i = 0; i < names.length; i ++) {
-			let name = names[i];
-			let album = albums[names[i]];
+		let keys = Object.keys(albums).sort((a, b) => a.localeCompare(b));
+		for(let i = 0; i < keys.length; i ++) {
+			let name = keys[i];
+			let album = albums[keys[i]];
 			let element = document.createElement("div");
 			element.id = name;
 			element.classList.add("block-item");
@@ -320,10 +332,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function listArtists() {
-		let names = Object.keys(artists);
-		for(let i = 0; i < names.length; i ++) {
-			let name = names[i];
-			let artist = artists[names[i]];
+		let keys = Object.keys(artists).sort((a, b) => a.localeCompare(b));
+		for(let i = 0; i < keys.length; i ++) {
+			let name = keys[i];
+			let artist = artists[keys[i]];
 			let element = document.createElement("div");
 			element.id = name;
 			element.classList.add("block-item");

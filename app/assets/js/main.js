@@ -357,6 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.classList.add("list-item");
 			element.classList.add("song");
 			element.id = song.file;
+			element.setAttribute("data-index", index);
 			element.innerHTML = '<svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg><span class="title">' + song.title + '</span><span class="album">' + song.album + '</span><span class="artist">' + song.artist + '</span><span class="duration">' + formatSeconds(song.duration) + '</span><svg class="more-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path class="more-path" d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
 
@@ -495,7 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(document.getElementById(currentSong).previousSibling !== null) {
 			previous = document.getElementById(currentSong).previousSibling;
 		}
-		playSong(previous.id, songs[previous.id]);
+		playSong(previous.id, songs[previous.getAttribute("data-index")]);
 	}
 
 	function playNextSong() {
@@ -504,7 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(document.getElementById(currentSong).nextSibling !== null) {
 			next = document.getElementById(currentSong).nextSibling;
 		}
-		playSong(next.id, songs[next.id]);
+		playSong(next.id, songs[next.getAttribute("data-index")]);
 	}
 
 	function searchSong(query) {

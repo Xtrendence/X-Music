@@ -26,6 +26,7 @@ const playlistsFile = dataDirectory + "playlists.json";
 let defaultSettings = JSON.stringify({
 	libraryDirectory:"",
 	loop:"none",
+	volume:100,
 	allowRemote:true
 });
 
@@ -164,6 +165,18 @@ app.on("ready", function() {
 		ipcMain.on("allowRemote", (error, req) => {
 			if(typeof req === "boolean") {
 				changeSettings("allowRemote", req);
+			}
+		});
+
+		ipcMain.on("setVolume", (error, req) => {
+			try {
+				let volume = parseInt(req);
+				if(volume >= 0 && volume <= 100) {
+					changeSettings("volume", volume);
+				}
+			}
+			catch(e) {
+				console.log(e);
 			}
 		});
 

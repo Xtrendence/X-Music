@@ -418,11 +418,11 @@ button, input, svg {
 	left:25px;
 }
 .audio-duration.time-total {
-	left:calc(50% + 70px);
+	left:calc(25% + 70px);
 }
 .audio-slider {
 	-webkit-appearance:none;
-	width:calc(50% - 25px - 25px - 15px);
+	width:calc(25% - 25px - 25px - 15px);
 	height:30px;
 	border-radius:10px;
 	background:var(--purple-lighter);
@@ -446,6 +446,37 @@ button, input, svg {
 	height:30px;
 	border-radius:10px;
 	background:var(--purple-dark);
+}
+.audio-volume-slider {
+	-webkit-appearance:none;
+	width:100px;
+	height:10px;
+	border-radius:10px;
+	background:var(--purple-lighter);
+	position:absolute;
+	padding:0;
+	margin:0;
+	top:35px;
+	left:calc(25% + 80px + 80px);
+	outline:none;
+	opacity:0.8;
+	-webkit-transition:0.25s;
+	transition:opacity 0.25s;
+}
+#desktop .audio-volume-slider:hover {
+	opacity:1;
+}
+.audio-volume-slider::-webkit-slider-thumb {
+	-webkit-appearance:none;
+	appearance:none;
+	width:10px;
+	height:10px;
+	border-radius:10px;
+	background:var(--purple-dark);
+}
+.audio-player .no-volume-icon, .audio-player .low-volume-icon, .audio-player .high-volume-icon {
+	left:calc(25% + 80px + 80px + 110px);
+	pointer-events:none;
 }
 
 .more-menu {

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let appPort = 1998;
 	let libraryDirectory = "";
 	let loop = "none";
+	let volume = 100;
 
 	let currentSong = "";
 
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
 	let inputSlider = document.getElementsByClassName("audio-slider")[0];
+	let inputVolume = document.getElementsByClassName("audio-volume-slider")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
 
 	let divListview = document.getElementsByClassName("listview")[0];
@@ -51,6 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let audioFile = document.getElementsByClassName("audio-file")[0];
 
+	let svgNoVolume = divAudioPlayer.getElementsByClassName("no-volume-icon")[0];
+	let svgLowVolume = divAudioPlayer.getElementsByClassName("low-volume-icon")[0];
+	let svgHighVolume = divAudioPlayer.getElementsByClassName("high-volume-icon")[0];
 	let svgPlay = divAudioPlayer.getElementsByClassName("play-icon")[0];
 	let svgPause = divAudioPlayer.getElementsByClassName("pause-icon")[0];
 	let svgLoop = divAudioPlayer.getElementsByClassName("loop-icon")[0];
@@ -227,6 +232,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.currentTime = inputSlider.value;
 	});
 
+	inputVolume.addEventListener("change", () => {
+		audioFile.volume = inputVolume.value / 100;
+		volume = parseInt(inputVolume.value);
+		setVolumeIcon();
+		ipcRenderer.send("setVolume", inputVolume.value);
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
@@ -260,6 +272,10 @@ document.addEventListener("DOMContentLoaded", () => {
 				spanRemoteIP.textContent = "";
 				spanRemoteIP.classList.add("hidden");
 			}
+			volume = parseInt(settings.volume);
+			audioFile.volume = settings.volume / 100;
+			inputVolume.value = settings.volume;
+			setVolumeIcon();
 		}
 	});
 
@@ -272,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("playSong", (error, res) => {
 		audioFile.src = "data:" + res.mime + ";base64," + res.base64;
+		audioFile.volume = volume / 100;
 		audioFile.load();
 		audioFile.play();
 		divListview.classList.add("active");
@@ -548,10 +565,27 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	function setVolumeIcon() {
+		console.log(volume);
+		svgNoVolume.classList.add("hidden");
+		svgLowVolume.classList.add("hidden");
+		svgHighVolume.classList.add("hidden");
+		if(volume === 0) {
+			svgNoVolume.classList.remove("hidden");
+		}
+		else if(volume >= 1 && volume <= 55) {
+			svgLowVolume.classList.remove("hidden");
+		}
+		else {
+			svgHighVolume.classList.remove("hidden");
+		}
+	}
+
 	function showPause() {
 		svgPlay.classList.add("hidden");
 		svgPause.classList.remove("hidden");
 	}
+
 	function showPlay() {
 		svgPause.classList.add("hidden");
 		svgPlay.classList.remove("hidden");

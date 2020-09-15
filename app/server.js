@@ -98,10 +98,12 @@ app.on("ready", function() {
 					let watch = fs.watch(libraryDirectory, { recursive:true, persistent:true }, () => {
 						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:true };
 						localWindow.webContents.send("getInfo", info);
+						localWindow.webContents.send("notify", { title:"Refreshing", description:"Your music library is being updated.", color:"rgb(40,40,40)", duration:5000})
 					});
 					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
 						if(error) {
 							console.log(error);
+							localWindow.webContents.send("notify", { title:"Error", description:"Couldn't fetch songs.", color:"rgb(40,40,40)", duration:5000})
 						}
 						else {
 							let songs = [];
@@ -128,6 +130,7 @@ app.on("ready", function() {
 									}
 								}).catch(error => {
 									console.log(error);
+									localWindow.webContents.send("notify", { title:"Error", description:"Couldn't parse the metadata.", color:"rgb(40,40,40)", duration:5000})
 								});
 							});
 						}
@@ -145,7 +148,13 @@ app.on("ready", function() {
 				fs.readFile(req, function(error, file) {
 					let base64 = Buffer.from(file).toString("base64");
 					localWindow.webContents.send("playSong", { base64:base64, mime:type });
+					if(error) {
+						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't read the audio file.", color:"rgb(40,40,40)", duration:5000})
+					}
 				});
+			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid file type.", color:"rgb(40,40,40)", duration:5000})
 			}
 		});
 
@@ -153,6 +162,9 @@ app.on("ready", function() {
 			let directory = dialog.showOpenDialogSync(localWindow, { title:"Select Music Library Directory", message:"Select the directory that contains your MP3, WAV, or OGG files.", properties:["openDirectory"] });
 			if(typeof directory !== "undefined") {
 				changeSettings("libraryDirectory", directory[0]);
+			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid library directory.", color:"rgb(40,40,40)", duration:5000})
 			}
 		});
 
@@ -166,6 +178,9 @@ app.on("ready", function() {
 			if(typeof req === "boolean") {
 				changeSettings("allowRemote", req);
 			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Boolean data type only.", color:"rgb(40,40,40)", duration:5000})
+			}
 		});
 
 		ipcMain.on("setVolume", (error, req) => {
@@ -177,6 +192,7 @@ app.on("ready", function() {
 			}
 			catch(e) {
 				console.log(e);
+				localWindow.webContents.send("notify", { title:"Error", description:"Volume value wasn't an integer.", color:"rgb(40,40,40)", duration:5000})
 			}
 		});
 
@@ -200,11 +216,13 @@ app.on("ready", function() {
 			fs.writeFile(settingsFile, defaultSettings, function(error) {
 				if(error) {
 					console.log(error);
+					localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000})
 				}
 				else {
 					settings = defaultSettings;
 					let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
 					localWindow.webContents.send("getInfo", info);
+					localWindow.webContents.send("notify", { title:"Reset", description:"Your settings have been reset.", color:"rgb(40,40,40)", duration:5000})
 				}
 			});
 		});
@@ -215,6 +233,12 @@ app.on("ready", function() {
 				if(req.replaceAll("/", "\\").includes(libraryDirectory)) {
 					shell.showItemInFolder(path.resolve(req));
 				}
+				else {
+					localWindow.webContents.send("notify", { title:"Error", description:"Access not authorized.", color:"rgb(40,40,40)", duration:5000})
+				}
+			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid settings. Try resetting them.", color:"rgb(40,40,40)", duration:5000})
 			}
 		});
 
@@ -275,6 +299,7 @@ app.on("ready", function() {
 				fs.writeFile(settingsFile, JSON.stringify(current), function(error) {
 					if(error) {
 						console.log(error);
+						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000})
 					}
 					else {
 						settings = JSON.stringify(current);

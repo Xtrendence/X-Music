@@ -155,7 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	buttonMoreAddToPlaylist.addEventListener("click", () => {
-
+		if(Object.keys(playlists).length === 0) {
+			notify("Error", "No playlists found.", "rgb(40,40,40)", 5000);
+		}
 	});
 
 	buttonMoreRemoveFromPlaylist.addEventListener("click", () => {
@@ -315,6 +317,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			audioFile.pause();
 			showPlay();
 		}
+	});
+
+	ipcRenderer.on("notify", (error, res) => {
+		notify(res.title, res.description, res.color, res.duration);
 	});
 
 	function getInfo() {
@@ -654,6 +660,36 @@ document.addEventListener("DOMContentLoaded", () => {
 		divListview.scrollTo(0, 0);
 
 		document.getElementsByClassName("sidebar-button " + page)[0].classList.add("active");
+	}
+
+	function notify(title, description, color, duration) {
+		let area;
+		if(document.getElementsByClassName("notification-area").length === 0) {
+			area = document.createElement("div");
+			area.classList.add("notification-area");
+			area.classList.add("noselect");
+			document.body.appendChild(area);
+		}
+		else {
+			area = document.getElementsByClassName("notification-area")[0];
+		}
+		let notification = document.createElement("div");
+		notification.classList.add("notification-wrapper");
+		notification.innerHTML = '<div class="notification-bubble" style="background:' + color + ';"><div class="notification-title-wrapper"><span class="notification-title">' + title + '</span></div><div class="notification-description-wrapper"><span class="notification-description">' + description + '</span></div></div>';
+		area.appendChild(notification);
+
+		notification.style.height = notification.scrollHeight + "px";
+		notification.style.visibility = "visible";
+		notification.getElementsByClassName("notification-bubble")[0].style.right = "20px";
+		setTimeout(function() {
+			notification.getElementsByClassName("notification-bubble")[0].style.right = "-600px";
+			setTimeout(function() {
+				notification.remove();
+				if(area.innerHTML === "") {
+					area.remove();
+				}
+			}, 500);
+		}, duration);
 	}
 });
 

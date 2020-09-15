@@ -595,3 +595,50 @@ button, input, svg {
 #desktop .input-choice.active:hover {
 	background:var(--purple-light);
 }
+
+.notification-area {
+	z-index:110;
+	position:fixed;
+	right:0;
+	bottom:20px;
+	width:480px;
+	overflow:hidden;
+}
+.notification-wrapper {
+	display:block;
+	visibility:hidden;
+	position:relative;
+	margin-top:20px;
+	height:auto;
+	width:100%;
+}
+.notification-bubble {
+	position:absolute;
+	z-index:26;
+	right:-400px;
+	top:0;
+	max-width:calc(100% - 140px);
+	min-width:200px;
+	padding:10px 15px 15px 15px;
+	background:rgb(50,50,50);
+	box-shadow:0 6px 10px rgba(60,60,60,0.2);
+	transition:right 0.4s;
+	overflow:hidden;
+	border-radius:10px;
+	color:rgb(245,245,245);
+	display:inline-block;
+}
+.notification-title-wrapper {
+	font-size:18px;
+	font-weight:bold;
+	color:rgb(245,245,245);
+	margin-top:10px;
+}
+.notification-description-wrapper {
+	margin-top:5px;
+	font-size:16px;
+	color:rgb(220,220,220);
+}
+.notification-description {
+	line-height:25px;
+}

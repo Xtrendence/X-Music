@@ -298,27 +298,30 @@ button, input, svg {
 	opacity:0.75;
 }
 .block-item svg {
-	width:50%;
-	height:50%;
+	width:40%;
+	height:40%;
 	display:block;
-	margin:5px auto 20px auto;
+	position:absolute;
+	left:30%;
 	fill:var(--text-light);
-}
-.block-item.artist svg {
-	margin-top:15px;
 }
 .block-item span {
 	color:var(--text-light);
 	display:block;
-	width:100%;
+	width:90%;
 	text-align:center;
-	line-height:30px;
 	white-space:nowrap;
 	overflow:hidden;
 	text-overflow:ellipsis;
+	position:absolute;
+	left:5%;
 }
 .block-item .title {
 	font-weight:bold;
+	bottom:50px;
+}
+.block-item .artist, .block-item .songs {
+	bottom:20px;
 }
 
 .audio-banner {
@@ -327,6 +330,9 @@ button, input, svg {
 	bottom:80px;
 	right:0;
 	box-shadow:var(--shadow-darker);
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 	line-height:30px;
 	height:30px;
 	display:block;
@@ -417,7 +423,7 @@ button, input, svg {
 	-webkit-appearance:none;
 	width:calc(25% - 25px - 25px - 15px);
 	height:30px;
-	border-radius:10px;
+	border-radius:13px;
 	background:var(--purple-lighter);
 	position:absolute;
 	padding:0;
@@ -437,7 +443,7 @@ button, input, svg {
 	appearance:none;
 	width:30px;
 	height:30px;
-	border-radius:10px;
+	border-radius:13px;
 	background:var(--purple-dark);
 }
 .audio-volume-slider {

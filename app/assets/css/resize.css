@@ -23,12 +23,28 @@
 		padding-right:30px;
 	}
 }
+@media screen and (max-width:1060px) {
+	.more-button {
+		padding:0 10px 0 10px;
+	}
+}
 @media screen and (max-width:990px) {
 	.list-item .title {
 		width:calc(100% - 150px - 60px - 100px - 150px);
 	}
 	.list-item .album {
 		display:none;
+	}
+}
+@media screen and (max-width:980px) {
+	.more-button {
+		font-size:16px;
+		padding:0 6px 0 6px;
+	}
+}
+@media screen and (max-width:880px) {
+	.more-button {
+		font-size:14px;
 	}
 }
 @media screen and (max-width:860px) {

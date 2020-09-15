@@ -228,6 +228,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	audioFile.addEventListener("ended", () => {
+		switch(loop) {
+			case "list":
+				playNextSong();
+				break;
+			case "song":
+				repeatSong();
+				break;
+		}
+	});
+
 	inputSlider.addEventListener("change", () => {
 		audioFile.currentTime = inputSlider.value;
 	});
@@ -506,6 +517,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			next = document.getElementById(currentSong).nextSibling;
 		}
 		playSong(next.id, songs[next.getAttribute("data-index")]);
+	}
+
+	function repeatSong() {
+		let current = document.getElementById(currentSong);
+		playSong(current.id, songs[current.getAttribute("data-index")]);
 	}
 
 	function searchSong(query) {

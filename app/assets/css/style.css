@@ -505,6 +505,9 @@ button, input, svg {
 .more-button:nth-of-type(3) {
 	background:var(--blue-medium);
 }
+.more-button:nth-of-type(5) {
+	background:var(--blue-medium);
+}
 .more-button svg {
 	fill:var(--text-light);
 	width:24px;
@@ -594,6 +597,42 @@ button, input, svg {
 }
 #desktop .input-choice.active:hover {
 	background:var(--purple-light);
+}
+
+.overlay {
+	background:rgba(0,0,0,0.9);
+	top:0;
+	left:0;
+	position:absolute;
+	width:100%;
+	height:100%;
+	z-index:105;
+}
+
+.add-playlist-menu {
+	z-index:106;
+	background:var(--purple-light);
+	height:140px;
+	width:240px;
+	top:calc(50% - (100px / 2));
+	left:calc(50% - (200px / 2));
+	position:absolute;
+	text-align:center;
+	font-size:0;
+	overflow:hidden;
+	border-radius:10px;
+}
+.add-playlist-menu .playlist-name {
+	width:calc(100% - 60px);
+	margin-left:auto;
+	margin-right:auto;
+	display:block;
+}
+.add-playlist-menu .input-button.cancel {
+	margin:20px 10px 0 0;
+}
+.add-playlist-menu .input-button.confirm {
+	margin:20px 0 0 10px;
 }
 
 .notification-area {

@@ -87,8 +87,7 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("getInfo", (error, req) => {
-			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
-			localWindow.webContents.send("getInfo", info);
+			sendInfo(false);
 		});
 
 		ipcMain.on("getSongs", (error, req) => {
@@ -96,14 +95,13 @@ app.on("ready", function() {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
 				if(libraryDirectory !== "") {
 					let watch = fs.watch(libraryDirectory, { recursive:true, persistent:true }, () => {
-						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:true };
-						localWindow.webContents.send("getInfo", info);
+						sendInfo(true);
 						localWindow.webContents.send("notify", { title:"Refreshing", description:"Your music library is being updated.", color:"rgb(40,40,40)", duration:5000})
 					});
 					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
 						if(error) {
 							console.log(error);
-							localWindow.webContents.send("notify", { title:"Error", description:"Couldn't fetch songs.", color:"rgb(40,40,40)", duration:5000})
+							localWindow.webContents.send("notify", { title:"Error", description:"Couldn't fetch songs.", color:"rgb(40,40,40)", duration:5000 });
 						}
 						else {
 							let songs = [];
@@ -130,7 +128,7 @@ app.on("ready", function() {
 									}
 								}).catch(error => {
 									console.log(error);
-									localWindow.webContents.send("notify", { title:"Error", description:"Couldn't parse the metadata.", color:"rgb(40,40,40)", duration:5000})
+									localWindow.webContents.send("notify", { title:"Error", description:"Couldn't parse the metadata.", color:"rgb(40,40,40)", duration:5000 });
 								});
 							});
 						}
@@ -149,7 +147,7 @@ app.on("ready", function() {
 					let base64 = Buffer.from(file).toString("base64");
 					localWindow.webContents.send("playSong", { base64:base64, mime:type });
 					if(error) {
-						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't read the audio file.", color:"rgb(40,40,40)", duration:5000})
+						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't read the audio file.", color:"rgb(40,40,40)", duration:5000 });
 					}
 				});
 			}
@@ -164,7 +162,7 @@ app.on("ready", function() {
 				changeSettings("libraryDirectory", directory[0]);
 			}
 			else {
-				localWindow.webContents.send("notify", { title:"Error", description:"Invalid library directory.", color:"rgb(40,40,40)", duration:5000})
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid library directory.", color:"rgb(40,40,40)", duration:5000 });
 			}
 		});
 
@@ -179,7 +177,7 @@ app.on("ready", function() {
 				changeSettings("allowRemote", req);
 			}
 			else {
-				localWindow.webContents.send("notify", { title:"Error", description:"Boolean data type only.", color:"rgb(40,40,40)", duration:5000})
+				localWindow.webContents.send("notify", { title:"Error", description:"Boolean data type only.", color:"rgb(40,40,40)", duration:5000 });
 			}
 		});
 
@@ -192,15 +190,49 @@ app.on("ready", function() {
 			}
 			catch(e) {
 				console.log(e);
-				localWindow.webContents.send("notify", { title:"Error", description:"Volume value wasn't an integer.", color:"rgb(40,40,40)", duration:5000})
+				localWindow.webContents.send("notify", { title:"Error", description:"Volume value wasn't an integer.", color:"rgb(40,40,40)", duration:5000 });
 			}
 		});
 
 		ipcMain.on("addPlaylist", (error, req) => {
+			let name = req.toString().trim();
+			if(typeof req !== "undefined" && name !== "") {
+				if(validJSON(playlists) || playlists.toString().trim() === "") {
+					let currentPlaylists = {};
 
+					if(playlists.toString().trim() !== "") {
+						currentPlaylists = JSON.parse(playlists.toString());
+					}
+
+					if(name in currentPlaylists) {
+						localWindow.webContents.send("notify", { title:"Error", description:"A playlist with that name already exists.", color:"rgb(40,40,40)", duration:5000 });
+					}
+					else {
+						currentPlaylists[name] = { songs:[] };
+						fs.writeFile(playlistsFile, JSON.stringify(currentPlaylists), (error) => {
+							if(error) {
+								console.log(error);
+								localWindow.webContents.send("notify", { title:"Error", description:"Could not write to playlists file.", color:"rgb(40,40,40)", duration:5000 });
+							}
+							else {
+								playlists = JSON.stringify(currentPlaylists);
+								sendInfo(false);
+								localWindow.webContents.send("notify", { title:"Playlist Created", description:"The playlist has been created.", color:"rgb(40,40,40)", duration:5000 });
+							}
+						});
+					}
+				}
+			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist name.", color:"rgb(40,40,40)", duration:5000 });
+			}
 		});
 
 		ipcMain.on("removePlaylist", (error, req) => {
+
+		});
+
+		ipcMain.on("renamePlaylist", (error, req) => {
 
 		});
 
@@ -213,16 +245,15 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("resetSettings", (error, req) => {
-			fs.writeFile(settingsFile, defaultSettings, function(error) {
+			fs.writeFile(settingsFile, defaultSettings, (error) => {
 				if(error) {
 					console.log(error);
-					localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000})
+					localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000 });
 				}
 				else {
 					settings = defaultSettings;
-					let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
-					localWindow.webContents.send("getInfo", info);
-					localWindow.webContents.send("notify", { title:"Reset", description:"Your settings have been reset.", color:"rgb(40,40,40)", duration:5000})
+					sendInfo(false);
+					localWindow.webContents.send("notify", { title:"Reset", description:"Your settings have been reset.", color:"rgb(40,40,40)", duration:5000 });
 				}
 			});
 		});
@@ -234,11 +265,11 @@ app.on("ready", function() {
 					shell.showItemInFolder(path.resolve(req));
 				}
 				else {
-					localWindow.webContents.send("notify", { title:"Error", description:"Access not authorized.", color:"rgb(40,40,40)", duration:5000})
+					localWindow.webContents.send("notify", { title:"Error", description:"Access not authorized.", color:"rgb(40,40,40)", duration:5000 });
 				}
 			}
 			else {
-				localWindow.webContents.send("notify", { title:"Error", description:"Invalid settings. Try resetting them.", color:"rgb(40,40,40)", duration:5000})
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid settings. Try resetting them.", color:"rgb(40,40,40)", duration:5000 });
 			}
 		});
 
@@ -282,6 +313,11 @@ app.on("ready", function() {
 			localWindow.webContents.send("pauseSong");
 		});
 
+		function sendInfo(forced) {
+			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:forced };
+			localWindow.webContents.send("getInfo", info);
+		}
+
 		function remoteCheck() {
 			if(validJSON(settings)) {
 				return JSON.parse(settings).allowRemote;
@@ -299,12 +335,11 @@ app.on("ready", function() {
 				fs.writeFile(settingsFile, JSON.stringify(current), function(error) {
 					if(error) {
 						console.log(error);
-						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000})
+						localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to settings file.", color:"rgb(40,40,40)", duration:5000 });
 					}
 					else {
 						settings = JSON.stringify(current);
-						let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:false };
-						localWindow.webContents.send("getInfo", info);
+						sendInfo(false);
 					}
 				});
 			}

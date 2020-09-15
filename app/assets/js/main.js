@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let body = document.getElementsByTagName("body")[0];
 
+	let divOverlay = document.getElementsByClassName("overlay")[0];
+	let divListview = document.getElementsByClassName("listview")[0];
+	let divAudioPlayer = document.getElementsByClassName("audio-player")[0];
+	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
+	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
+	let divAddPlaylistMenu = document.getElementsByClassName("add-playlist-menu")[0];
+
 	let buttonRefresh = document.getElementsByClassName("title-button refresh")[0];
 	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
 	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
@@ -40,15 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonMoreRemoveFromPlaylist = document.getElementsByClassName("more-button remove-from-playlist")[0];
 	let buttonMoreOpenFileLocation = document.getElementsByClassName("more-button open-file-location")[0];
 
+	let buttonAddPlaylistCancel = divAddPlaylistMenu.getElementsByClassName("input-button cancel")[0];
+	let buttonAddPlaylistConfirm = divAddPlaylistMenu.getElementsByClassName("input-button confirm")[0];
+
 	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
 	let inputSlider = document.getElementsByClassName("audio-slider")[0];
 	let inputVolume = document.getElementsByClassName("audio-volume-slider")[0];
 	let inputLibraryDirectory = document.getElementsByClassName("input-field library-directory")[0];
-
-	let divListview = document.getElementsByClassName("listview")[0];
-	let divAudioPlayer = document.getElementsByClassName("audio-player")[0];
-	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
-	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
+	let inputAddPlaylistName = divAddPlaylistMenu.getElementsByClassName("input-field playlist-name")[0];
 
 	let audioFile = document.getElementsByClassName("audio-file")[0];
 
@@ -161,7 +167,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	buttonMoreRemoveFromPlaylist.addEventListener("click", () => {
-
+		if(Object.keys(playlists).length === 0) {
+			notify("Error", "No playlists found.", "rgb(40,40,40)", 5000);
+		}
 	});
 
 	buttonMoreOpenFileLocation.addEventListener("click", () => {
@@ -169,6 +177,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		let song = songs[index];
 		let file = song.file;
 		ipcRenderer.send("openFileLocation", file);
+	});
+
+	buttonAddPlaylistCancel.addEventListener("click", () => {
+		hideAddPlaylistMenu();
+	});
+
+	buttonAddPlaylistConfirm.addEventListener("click", () => {
+		ipcRenderer.send("addPlaylist", inputAddPlaylistName.value);
+		hideAddPlaylistMenu();
 	});
 
 	inputSearch.addEventListener("keydown", () => {
@@ -236,15 +253,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	inputSlider.addEventListener("change", () => {
+	inputSlider.addEventListener("input", () => {
 		audioFile.currentTime = inputSlider.value;
 	});
 
-	inputVolume.addEventListener("change", () => {
+	inputVolume.addEventListener("input", () => {
 		audioFile.volume = inputVolume.value / 100;
 		volume = parseInt(inputVolume.value);
 		setVolumeIcon();
 		ipcRenderer.send("setVolume", inputVolume.value);
+	});
+
+	inputAddPlaylistName.addEventListener("keydown", (e) => {
+		if(e.key.toLowerCase() === "enter") {
+			buttonAddPlaylistConfirm.click();
+		}
 	});
 
 	ipcRenderer.on("getInfo", (error, res) => {
@@ -284,6 +307,15 @@ document.addEventListener("DOMContentLoaded", () => {
 			audioFile.volume = settings.volume / 100;
 			inputVolume.value = settings.volume;
 			setVolumeIcon();
+		}
+		if(validJSON(res.playlists)) {
+			let activePage = document.getElementsByClassName("sidebar-button active")[0];
+			if(playlists !== JSON.parse(res.playlists)) {
+				playlists = JSON.parse(res.playlists);
+				if(activePage.classList.contains("playlists")) {
+					showPage("playlists");
+				}
+			}
 		}
 	});
 
@@ -470,6 +502,36 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg><span class="title">No Playlists Found...</span>';
 			divListview.appendChild(element);
 		}
+
+		let element = document.createElement("div");
+		element.classList.add("block-item");
+		element.classList.add("add-playlist");
+		element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg><span class="title">Add a Playlist</span>';
+		divListview.appendChild(element);
+
+		element.addEventListener("click", () => {
+			showAddPlaylistMenu();
+		});
+
+		let keys = Object.keys(playlists).sort((a, b) => a.localeCompare(b));
+		for(let i = 0; i < keys.length; i ++) {
+			let name = keys[i];
+			let playlist = playlists[keys[i]];
+			let element = document.createElement("div");
+			element.id = name;
+			element.classList.add("block-item");
+			element.classList.add("playlist");
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M48 48a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm448 16H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg><span class="title">' + name + '</span>';
+			divListview.appendChild(element);
+
+			element.addEventListener("click", () => {
+				let playlistSongs = {};
+				for(let i = 0; i < playlist.songs.length; i++) {
+					playlistSongs[playlist.songs[i]] = playlists[playlist.songs[i]];
+				}
+				showPage("songs", { songs:playlistSongs });
+			});
+		}
 	}
 
 	function showMoreMenu(element, index) {
@@ -482,6 +544,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		divMoreMenu.classList.add("hidden");
 		divMoreMenu.removeAttribute("data-index");
 		divMoreMenu.removeAttribute("style");
+	}
+
+	function showAddPlaylistMenu() {
+		divOverlay.classList.remove("hidden");
+		divAddPlaylistMenu.classList.remove("hidden");
+	}
+
+	function hideAddPlaylistMenu() {
+		divOverlay.classList.add("hidden");
+		divAddPlaylistMenu.classList.add("hidden");
+		inputAddPlaylistName.value = "";
 	}
 
 	function hideAudioPlayer() {
@@ -584,7 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function setVolumeIcon() {
-		console.log(volume);
 		svgNoVolume.classList.add("hidden");
 		svgLowVolume.classList.add("hidden");
 		svgHighVolume.classList.add("hidden");

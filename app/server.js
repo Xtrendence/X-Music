@@ -180,6 +180,22 @@ app.on("ready", function() {
 			}
 		});
 
+		ipcMain.on("addPlaylist", (error, req) => {
+
+		});
+
+		ipcMain.on("removePlaylist", (error, req) => {
+
+		});
+
+		ipcMain.on("playlistAddSong", (error, req) => {
+
+		});
+
+		ipcMain.on("playlistRemoveSong", (error, req) => {
+
+		});
+
 		ipcMain.on("resetSettings", (error, req) => {
 			fs.writeFile(settingsFile, defaultSettings, function(error) {
 				if(error) {

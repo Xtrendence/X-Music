@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let body = document.getElementsByTagName("body")[0];
 
-	let buttonDiagnostics = document.getElementsByClassName("title-button diagnostics")[0];
 	let buttonRefresh = document.getElementsByClassName("title-button refresh")[0];
 	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
 	let buttonMaximize = document.getElementsByClassName("title-button maximize")[0];
@@ -90,10 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(!exception) {
 			hideMoreMenu();
 		}
-	});
-
-	buttonDiagnostics.addEventListener("click", () => {
-
 	});
 
 	buttonRefresh.addEventListener("click", () => {

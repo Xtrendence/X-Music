@@ -554,11 +554,16 @@ document.addEventListener("DOMContentLoaded", () => {
 			divListview.appendChild(element);
 
 			element.addEventListener("click", () => {
-				let playlistSongs = {};
-				for(let i = 0; i < playlist.indices.length; i++) {
-					playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
+				if(playlist.songs.length === 0) {
+					notify("Error", "That playlist is empty.", "rgb(40,40,40)", 5000);
 				}
-				showPage("songs", { songs:playlistSongs });
+				else {
+					let playlistSongs = {};
+					for(let i = 0; i < playlist.indices.length; i++) {
+						playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
+					}
+					showPage("songs", { songs:playlistSongs });
+				}
 			});
 		}
 	}

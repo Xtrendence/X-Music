@@ -725,7 +725,7 @@ button, input, svg {
 	min-width:200px;
 	padding:10px 15px 15px 15px;
 	background:rgb(50,50,50);
-	box-shadow:0 6px 10px rgba(60,60,60,0.2);
+	box-shadow:var(--shadow-darker);
 	transition:right 0.4s;
 	overflow:hidden;
 	border-radius:10px;

@@ -229,7 +229,37 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("removePlaylist", (error, req) => {
+			let name = req.toString().trim();
+			if(typeof req !== "undefined" && name !== "") {
+				if(validJSON(playlists) || playlists.toString().trim() === "") {
+					let currentPlaylists = {};
 
+					if(playlists.toString().trim() !== "") {
+						currentPlaylists = JSON.parse(playlists.toString());
+					}
+
+					if(name in currentPlaylists) {
+						delete currentPlaylists[name];
+						fs.writeFile(playlistsFile, JSON.stringify(currentPlaylists), (error) => {
+							if(error) {
+								console.log(error);
+								localWindow.webContents.send("notify", { title:"Error", description:"Could not write to playlists file.", color:"rgb(40,40,40)", duration:5000 });
+							}
+							else {
+								playlists = JSON.stringify(currentPlaylists);
+								sendInfo(true);
+								localWindow.webContents.send("notify", { title:"Playlist Deleted", description:"The playlist has been deleted.", color:"rgb(40,40,40)", duration:5000 });
+							}
+						});
+					}
+					else {
+						localWindow.webContents.send("notify", { title:"Error", description:"That playlist doesn't exist.", color:"rgb(40,40,40)", duration:5000 });
+					}
+				}
+			}
+			else {
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist name.", color:"rgb(40,40,40)", duration:5000 });
+			}
 		});
 
 		ipcMain.on("renamePlaylist", (error, req) => {
@@ -252,7 +282,7 @@ app.on("ready", function() {
 							}
 							else {
 								playlists = JSON.stringify(currentPlaylists);
-								sendInfo(false);
+								sendInfo(true);
 								localWindow.webContents.send("notify", { title:"Song Added", description:"The song has been added to the playlist.", color:"rgb(40,40,40)", duration:5000 });
 							}
 						});

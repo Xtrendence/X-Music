@@ -324,24 +324,43 @@ button, input, svg {
 	bottom:20px;
 }
 
-.audio-banner {
+.audio-banner-wrapper {
 	position:absolute;
 	z-index:90;
 	bottom:80px;
 	right:0;
+	height:30px;
 	box-shadow:var(--shadow-darker);
+	background:var(--blue-light);
+	width:calc(100% - 200px);
+}
+.audio-banner {
+	position:absolute;
+	top:0;
+	left:25px;
+	font-size:15px;
+	font-weight:bold;
+	color:var(--text-light);
+	width:calc(100% - 100px);
+	display:block;
+	line-height:30px;
 	overflow:hidden;
 	white-space:nowrap;
 	text-overflow:ellipsis;
-	line-height:30px;
-	height:30px;
-	display:block;
-	font-size:15px;
-	font-weight:bold;
-	padding-left:25px;
-	color:var(--text-light);
-	background:var(--blue-light);
-	width:calc(100% - 200px - 25px);
+}
+.audio-banner-wrapper svg {
+	fill:var(--text-light);
+	width:18px;
+	height:18px;
+	padding:6px;
+	position:absolute;
+	top:0;
+}
+#desktop .audio-banner-wrapper svg:hover {
+	fill:var(--text-darker);
+}
+.audio-banner-wrapper .close-audio-player {
+	right:0;
 }
 
 .audio-player {

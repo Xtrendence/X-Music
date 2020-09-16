@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let divOverlay = document.getElementsByClassName("overlay")[0];
 	let divListview = document.getElementsByClassName("listview")[0];
 	let divAudioPlayer = document.getElementsByClassName("audio-player")[0];
+	let divAudioBanner = document.getElementsByClassName("audio-banner-wrapper")[0];
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
 	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
 	let divAddPlaylistMenu = document.getElementsByClassName("add-playlist-menu")[0];
@@ -66,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let svgLoop = divAudioPlayer.getElementsByClassName("loop-icon")[0];
 	let svgPrevious = divAudioPlayer.getElementsByClassName("previous-icon")[0];
 	let svgNext = divAudioPlayer.getElementsByClassName("next-icon")[0];
+	let svgCloseAudioPlayer = divAudioBanner.getElementsByClassName("close-audio-player")[0];
 
 	let spanAudioBanner = document.getElementsByClassName("audio-banner")[0];
 	let spanTimePassed = document.getElementsByClassName("audio-duration time-passed")[0];
@@ -230,6 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		playNextSong();
 	});
 
+	svgCloseAudioPlayer.addEventListener("click", () => {
+		hideAudioPlayer();
+	});
+
 	audioFile.addEventListener("timeupdate", () => {
 		inputSlider.value = audioFile.currentTime;
 		inputSlider.setAttribute("value", audioFile.currentTime);
@@ -332,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.load();
 		audioFile.play();
 		divListview.classList.add("active");
-		spanAudioBanner.classList.remove("hidden");
+		divAudioBanner.classList.remove("hidden");
 		divAudioPlayer.classList.remove("hidden");
 		showPause();
 	});
@@ -566,7 +572,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.pause();
 		audioFile.src = "";
 		divListview.classList.remove("active");
-		spanAudioBanner.classList.add("hidden");
+		divAudioBanner.classList.add("hidden");
 		divAudioPlayer.classList.add("hidden");
 		showPlay();
 	}
@@ -641,7 +647,14 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 			}
 			else if(activePage.classList.contains("playlists")) {
-
+				let elements = document.getElementsByClassName("block-item playlist");
+				for(let i = 0; i < elements.length; i++) {
+					let element = elements[i];
+					let title = element.getElementsByClassName("title")[0].textContent.toLowerCase();
+					if(!title.includes(query)) {
+						element.style.display = "none";
+					}
+				}
 			}
 		}
 		else {

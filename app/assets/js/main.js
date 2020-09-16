@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
 	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
 	let divAddPlaylistMenu = document.getElementsByClassName("add-playlist-menu")[0];
+	let divChoosePlaylistMenu = document.getElementsByClassName("choose-playlist-menu")[0];
 
 	let buttonRefresh = document.getElementsByClassName("title-button refresh")[0];
 	let buttonMinimize = document.getElementsByClassName("title-button minimize")[0];
@@ -166,11 +167,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(Object.keys(playlists).length === 0) {
 			notify("Error", "No playlists found.", "rgb(40,40,40)", 5000);
 		}
+		else {
+			showChoosePlaylistMenu(divMoreMenu.getAttribute("data-index"), "add");
+		}
 	});
 
 	buttonMoreRemoveFromPlaylist.addEventListener("click", () => {
 		if(Object.keys(playlists).length === 0) {
 			notify("Error", "No playlists found.", "rgb(40,40,40)", 5000);
+		}
+		else {
+			showChoosePlaylistMenu(divMoreMenu.getAttribute("data-index"), "remove");
 		}
 	});
 
@@ -276,6 +283,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	divOverlay.addEventListener("click", () => {
+		hideAddPlaylistMenu();
+		hideChoosePlaylistMenu();
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
@@ -318,6 +330,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			let activePage = document.getElementsByClassName("sidebar-button active")[0];
 			if(playlists !== JSON.parse(res.playlists)) {
 				playlists = JSON.parse(res.playlists);
+				let playlistNames = Object.keys(playlists);
+				for(let i = 0; i < playlistNames.length; i++) {
+					playlists[playlistNames[i]].indices = [];
+				}
 				if(activePage.classList.contains("playlists")) {
 					showPage("playlists");
 				}
@@ -403,6 +419,13 @@ document.addEventListener("DOMContentLoaded", () => {
 				albums[album] = { artist:song.artist, songs:[index] };
 			}
 
+			let playlistNames = Object.keys(playlists);
+			for(let j = 0; j < playlistNames.length; j++) {
+				if(playlists[playlistNames[j]].songs.includes(song.file)) {
+					playlists[playlistNames[j]].indices.push(index);
+				}
+			}
+
 			let element = document.createElement("div");
 			element.classList.add("list-item");
 			element.classList.add("song");
@@ -434,10 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function sortSongs() {
 		songs.sort((a, b) => a.title.localeCompare(b.title));
-	}
-
-	function sortPlaylists() {
-
 	}
 
 	function listAlbums() {
@@ -536,8 +555,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			element.addEventListener("click", () => {
 				let playlistSongs = {};
-				for(let i = 0; i < playlist.songs.length; i++) {
-					playlistSongs[playlist.songs[i]] = playlists[playlist.songs[i]];
+				for(let i = 0; i < playlist.indices.length; i++) {
+					playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
 				}
 				showPage("songs", { songs:playlistSongs });
 			});
@@ -565,6 +584,52 @@ document.addEventListener("DOMContentLoaded", () => {
 		divOverlay.classList.add("hidden");
 		divAddPlaylistMenu.classList.add("hidden");
 		inputAddPlaylistName.value = "";
+	}
+
+	function showChoosePlaylistMenu(index, action) {
+		divOverlay.classList.remove("hidden");
+		divChoosePlaylistMenu.classList.remove("hidden");
+		divChoosePlaylistMenu.innerHTML = "";
+		let song = songs[index];
+		let file = song.file;
+		let keys = Object.keys(playlists).sort((a, b) => a.localeCompare(b));
+		for(let i = 0; i < keys.length; i++) {
+			let name = keys[i];
+			let playlist = playlists[keys[i]];
+			if(!playlist.songs.includes(file) && action === "add" || playlist.songs.includes(file) && action === "remove") {
+				let element = document.createElement("div");
+				element.classList.add("list-item");
+				element.classList.add("noselect");
+				let text;
+				playlist.songs.length === 1 ? text = " Song" : text = " Songs";
+				element.innerHTML = '<span>' + name + '</span><span>' + playlist.songs.length + text + '</span>';
+				divChoosePlaylistMenu.appendChild(element);
+
+				element.addEventListener("click", () => {
+					if(action === "remove") {
+						ipcRenderer.send("playlistRemoveSong", { playlist:name, file:file });
+					}
+					else if(action === "add") {
+						ipcRenderer.send("playlistAddSong", { playlist:name, file:file });
+					}
+					hideChoosePlaylistMenu();
+				});
+			}
+		}
+		if(divChoosePlaylistMenu.innerHTML === "") {
+			hideChoosePlaylistMenu();
+			if(action === "remove") {
+				notify("Error", "No playlists exist with that song.", "rgb(40,40,40)", 5000);
+			}
+			else if(action === "add") {
+				notify("Error", "That song already exists in all your playlists.", "rgb(40,40,40)", 5000);
+			}
+		}
+	}
+
+	function hideChoosePlaylistMenu() {
+		divOverlay.classList.add("hidden");
+		divChoosePlaylistMenu.classList.add("hidden");
 	}
 
 	function hideAudioPlayer() {

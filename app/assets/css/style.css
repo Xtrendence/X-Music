@@ -660,6 +660,46 @@ button, input, svg {
 	margin:20px 0 0 10px;
 }
 
+.choose-playlist-menu {
+	z-index:106;
+	background:var(--purple-light);
+	height:300px;
+	width:240px;
+	top:calc(50% - (300px / 2));
+	left:calc(50% - (200px / 2));
+	position:absolute;
+	text-align:center;
+	font-size:0;
+	overflow-x:hidden;
+	overflow-y:scroll;
+	scroll-behavior:smooth;
+	-webkit-overflow-scrolling:touch;
+	border-radius:10px;
+}
+.choose-playlist-menu .list-item {
+	background:var(--purple-dark);
+	padding-top:10px;
+	padding-bottom:10px;
+	transition:background 0.25s;
+}
+#desktop .choose-playlist-menu .list-item:hover {
+	background:var(--purple-medium);
+}
+.choose-playlist-menu .list-item:first-of-type {
+	margin-top:20px;
+}
+.choose-playlist-menu .list-item span {
+	display:block;
+	width:90%;
+	text-align:center;
+	margin:0 auto 0 auto;
+	line-height:25px;
+	font-size:18px;
+}
+.choose-playlist-menu .list-item span:first-of-type {
+	font-weight:bold;
+}
+
 .notification-area {
 	z-index:110;
 	position:fixed;

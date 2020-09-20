@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let divAudioBanner = document.getElementsByClassName("audio-banner-wrapper")[0];
 	let divSettingsWrapper = document.getElementsByClassName("settings-wrapper")[0];
 	let divMoreMenu = document.getElementsByClassName("more-menu")[0];
+	let divMoreMenuPlaylist = document.getElementsByClassName("more-menu-playlist")[0];
 	let divAddPlaylistMenu = document.getElementsByClassName("add-playlist-menu")[0];
 	let divChoosePlaylistMenu = document.getElementsByClassName("choose-playlist-menu")[0];
 
@@ -49,6 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonMoreRemoveFromPlaylist = document.getElementsByClassName("more-button remove-from-playlist")[0];
 	let buttonMoreOpenFileLocation = document.getElementsByClassName("more-button open-file-location")[0];
 
+	let buttonMoreClosePlaylist = document.getElementsByClassName("more-button-playlist close-menu")[0];
+	let buttonMoreDeletePlaylist = document.getElementsByClassName("more-button-playlist delete-playlist")[0];
+	let buttonMoreRenamePlaylist = document.getElementsByClassName("more-button-playlist rename-playlist")[0];
 	let buttonAddPlaylistCancel = divAddPlaylistMenu.getElementsByClassName("input-button cancel")[0];
 	let buttonAddPlaylistConfirm = divAddPlaylistMenu.getElementsByClassName("input-button confirm")[0];
 
@@ -89,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.addEventListener("click", (e) => {
 		let target = e.target;
 		let moreMenuExceptions = ["more-menu", "more-button", "more-icon", "more-path"];
+		let moreMenuPlaylistExceptions = ["more-menu-playlist", "more-button-playlist", "more-icon-playlist", "more-path-playlist"];
+
 		let exception = false;
 		for(let i = 0; i < moreMenuExceptions.length; i++) {
 			if(target.classList.contains(moreMenuExceptions[i])) {
@@ -98,6 +104,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(!exception) {
 			hideMoreMenu();
 		}
+
+		exception = false;
+		for(let i = 0; i < moreMenuPlaylistExceptions.length; i++) {
+			if(target.classList.contains(moreMenuPlaylistExceptions[i])) {
+				exception = true;
+			}
+		}
+		if(!exception) {
+			hideMoreMenuPlaylist();
+		}
+	});
+
+	window.addEventListener("resize", () => {
+		hideMoreMenu();
+		hideMoreMenuPlaylist();
 	});
 
 	buttonRefresh.addEventListener("click", () => {
@@ -188,12 +209,31 @@ document.addEventListener("DOMContentLoaded", () => {
 		ipcRenderer.send("openFileLocation", file);
 	});
 
+	buttonMoreClosePlaylist.addEventListener("click", () => {
+		hideMoreMenuPlaylist();
+	});
+	buttonMoreDeletePlaylist.addEventListener("click", () => {
+		ipcRenderer.send("removePlaylist", divMoreMenuPlaylist.getAttribute("data-name"));
+		hideMoreMenuPlaylist();
+	});
+	buttonMoreRenamePlaylist.addEventListener("click", () => {
+		showAddPlaylistMenu("rename", divMoreMenuPlaylist.getAttribute("data-name"));
+		hideMoreMenuPlaylist();
+	});
+
 	buttonAddPlaylistCancel.addEventListener("click", () => {
 		hideAddPlaylistMenu();
 	});
 
 	buttonAddPlaylistConfirm.addEventListener("click", () => {
-		ipcRenderer.send("addPlaylist", inputAddPlaylistName.value);
+		let action = divAddPlaylistMenu.getAttribute("data-action");
+		if(action === "add") {
+			ipcRenderer.send("addPlaylist", inputAddPlaylistName.value);
+		}
+		else if(action === "rename") {
+			let currentName = divAddPlaylistMenu.getAttribute("data-current");
+			ipcRenderer.send("renamePlaylist", { current:currentName, new:inputAddPlaylistName.value });
+		}
 		hideAddPlaylistMenu();
 	});
 
@@ -537,7 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		divListview.appendChild(element);
 
 		element.addEventListener("click", () => {
-			showAddPlaylistMenu();
+			showAddPlaylistMenu("add");
 		});
 
 		let keys = Object.keys(playlists).sort((a, b) => a.localeCompare(b));
@@ -550,19 +590,28 @@ document.addEventListener("DOMContentLoaded", () => {
 			element.classList.add("playlist");
 			let text;
 			playlist.songs.length === 1 ? text = " Song" : text = " Songs";
-			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M48 48a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm448 16H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg><span class="title">' + name + '</span><span class="songs">' + playlist.songs.length + text + '</span>';
+			element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M48 48a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm448 16H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg><span class="title">' + name + '</span><span class="songs">' + playlist.songs.length + text + '</span></span><svg class="more-icon-playlist" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path class="more-path-playlist" d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg>';
 			divListview.appendChild(element);
 
-			element.addEventListener("click", () => {
-				if(playlist.songs.length === 0) {
-					notify("Error", "That playlist is empty.", "rgb(40,40,40)", 5000);
-				}
-				else {
-					let playlistSongs = {};
-					for(let i = 0; i < playlist.indices.length; i++) {
-						playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
+			let moreIcon = element.getElementsByClassName("more-icon-playlist")[0];
+
+			moreIcon.addEventListener("click", (e) => {
+				showMoreMenuPlaylist(e, name);
+			});
+
+			element.addEventListener("click", (e) => {
+				let target = e.target;
+				if(!target.classList.contains("more-icon-playlist") && !target.classList.contains("more-path-playlist")) {
+					if(playlist.songs.length === 0) {
+						notify("Error", "That playlist is empty.", "rgb(40,40,40)", 5000);
 					}
-					showPage("songs", { songs:playlistSongs });
+					else {
+						let playlistSongs = {};
+						for(let i = 0; i < playlist.indices.length; i++) {
+							playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
+						}
+						showPage("songs", { songs:playlistSongs });
+					}
 				}
 			});
 		}
@@ -580,14 +629,49 @@ document.addEventListener("DOMContentLoaded", () => {
 		divMoreMenu.removeAttribute("style");
 	}
 
-	function showAddPlaylistMenu() {
+	function showMoreMenuPlaylist(event, name) {
+		divMoreMenuPlaylist.setAttribute("data-name", name);
+		divMoreMenuPlaylist.classList.remove("hidden");
+
+		let width = divMoreMenuPlaylist.offsetWidth;
+		let height = divMoreMenuPlaylist.offsetHeight;
+		let containerWidth = divListview.offsetWidth;
+		let containerHeight = divListview.offsetHeight;
+		let x = event.clientX;
+		let y = event.clientY;
+
+		if(x + width >= containerWidth) {
+			x -= width;
+		}
+		if(y + height >= containerHeight) {
+			y -= height;
+		}
+
+		divMoreMenuPlaylist.style.left = x + "px";
+		divMoreMenuPlaylist.style.top = y + "px";
+	}
+
+	function hideMoreMenuPlaylist() {
+		divMoreMenuPlaylist.classList.add("hidden");
+		divMoreMenuPlaylist.removeAttribute("data-name");
+		divMoreMenuPlaylist.removeAttribute("style");
+	}
+
+	function showAddPlaylistMenu(action, currentName) {
 		divOverlay.classList.remove("hidden");
 		divAddPlaylistMenu.classList.remove("hidden");
+		divAddPlaylistMenu.setAttribute("data-action", action);
+		if(action === "rename") {
+			divAddPlaylistMenu.setAttribute("data-current", currentName);
+			inputAddPlaylistName.value = currentName;
+		}
 	}
 
 	function hideAddPlaylistMenu() {
 		divOverlay.classList.add("hidden");
 		divAddPlaylistMenu.classList.add("hidden");
+		divAddPlaylistMenu.removeAttribute("data-action");
+		divAddPlaylistMenu.removeAttribute("data-current");
 		inputAddPlaylistName.value = "";
 	}
 

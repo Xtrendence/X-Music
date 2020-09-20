@@ -16,6 +16,10 @@ Yes, you can. Through X:/Music's settings, you can change the location of your m
 
 The song's title, artist, album, and duration are read and displayed. To keep it lightweight, and to ensure the UI's consistency, album artwork will not be displayed. Due to Node.js' limited number of libraries regarding the reading and writing of metadata, and complications with cross-platform compatibility, the metadata of audio files will not be editable, and will only be read/used in a very limited way.
 
+### What should I do if I encounter a bug?
+
+If you encounter a bug, it'll most likely be due to something being wrong with the data files, which are "settings.json" and "playlists.json", both of which can be safely deleted (though this would reset both your settings in the app, and your playlists). If you manage to get a screenshot of the error, please contact me and include information such as what operating system you were using, what you were doing when you got the error, and if possible, the steps required to reproduce the bug.
+
 ### Is this secure?
 
 It should be, yes. On the server-side, there aren't any shell commands or any user input that could be used to gain access to anything X:/Music shouldn't have access to. For security reasons, audio files cannot be deleted or modified in any way through the app. The only files X:/Music writes to are the "settings.json" and "playlists.json" files in the "data" directory. Besides that, X:/Music doesn't write data anywhere else on the OS, and as far as reading is concerned, only MP3, WAV, and OGG files are supported, so it shouldn't be possible to trick it into reading other file types unless the server-side code is modified. 

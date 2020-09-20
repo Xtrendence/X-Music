@@ -302,36 +302,42 @@ app.on("ready", function() {
 		});
 
 		ipcMain.on("playlistAddSong", (error, req) => {
-			if(typeof req.playlist !== "undefined" && req.playlist.toString().trim() !== "" && typeof req.file !== "undefined" && req.file.toString().trim() !== "") {
-				let name = req.playlist.toString().trim();
-				let file = req.file.toString().trim();
-				if(validJSON(playlists)) {
-					let currentPlaylists = JSON.parse(playlists);
-					let playlist = currentPlaylists[name];
-					let playlistSongs = playlist.songs;
-					if(!playlistSongs.includes(file)) {
-						currentPlaylists[name].songs.push(file);
-						fs.writeFile(playlistsFile, JSON.stringify(currentPlaylists), (error) => {
-							if(error) {
-								localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to playlist file...", color:"rgb(40,40,40)", duration:5000 });
-							}
-							else {
-								playlists = JSON.stringify(currentPlaylists);
-								sendInfo(true);
-								localWindow.webContents.send("notify", { title:"Song Added", description:"The song has been added to the playlist.", color:"rgb(40,40,40)", duration:5000 });
-							}
-						});
+			if(validJSON(settings)) {
+				let libraryDirectory = JSON.parse(settings).libraryDirectory;
+				if(typeof req.playlist !== "undefined" && req.playlist.toString().trim() !== "" && typeof req.file !== "undefined" && req.file.toString().trim() !== "") {
+					let name = req.playlist.toString().trim();
+					let file = req.file.toString().trim().replace(libraryDirectory.replaceAll("\\", "/"), "");
+					if(validJSON(playlists)) {
+						let currentPlaylists = JSON.parse(playlists);
+						let playlist = currentPlaylists[name];
+						let playlistSongs = playlist.songs;
+						if(!playlistSongs.includes(file)) {
+							currentPlaylists[name].songs.push(file);
+							fs.writeFile(playlistsFile, JSON.stringify(currentPlaylists), (error) => {
+								if(error) {
+									localWindow.webContents.send("notify", { title:"Error", description:"Couldn't write to playlist file...", color:"rgb(40,40,40)", duration:5000 });
+								}
+								else {
+									playlists = JSON.stringify(currentPlaylists);
+									sendInfo(true);
+									localWindow.webContents.send("notify", { title:"Song Added", description:"The song has been added to the playlist.", color:"rgb(40,40,40)", duration:5000 });
+								}
+							});
+						}
+						else {
+							localWindow.webContents.send("notify", { title:"Error", description:"That playlist already has that song.", color:"rgb(40,40,40)", duration:5000 });
+						}
 					}
 					else {
-						localWindow.webContents.send("notify", { title:"Error", description:"That playlist already has that song.", color:"rgb(40,40,40)", duration:5000 });
+						localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist JSON data.", color:"rgb(40,40,40)", duration:5000 });
 					}
 				}
 				else {
-					localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist JSON data.", color:"rgb(40,40,40)", duration:5000 });
+					localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist name or audio file.", color:"rgb(40,40,40)", duration:5000 });
 				}
 			}
 			else {
-				localWindow.webContents.send("notify", { title:"Error", description:"Invalid playlist name or audio file.", color:"rgb(40,40,40)", duration:5000 });
+				localWindow.webContents.send("notify", { title:"Error", description:"Invalid settings. Try resetting them.", color:"rgb(40,40,40)", duration:5000 });
 			}
 		});
 

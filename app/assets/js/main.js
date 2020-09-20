@@ -461,7 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			let playlistNames = Object.keys(playlists);
 			for(let j = 0; j < playlistNames.length; j++) {
-				if(playlists[playlistNames[j]].songs.includes(song.file)) {
+				if(playlists[playlistNames[j]].songs.includes(song.file.replace(libraryDirectory.replaceAll("\\", "/"), ""))) {
 					playlists[playlistNames[j]].indices.push(index);
 				}
 			}

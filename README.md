@@ -12,6 +12,8 @@ The default music players of different operating systems are entirely different 
 
 Yes, you can. Through X:/Music's settings, you can change the location of your music library to wherever your current one is. You won't be able to import playlists (this feature might be added in the future) or any ratings. X:/Music simply searches the entire directory and its subdirectories for MP3, WAV, and OGG files, so you can easily add new songs and move around your library by simply dropping files that have the same type as the three aforementioned ones, and it'll automatically get added to your music library.
 
+Because of the way it works, you should keep in mind that changing the location or structure of your music library would break your playlists. To fix them, use the button in the settings section.
+
 ### Does X:/Music read and display the metadata of audio files?
 
 The song's title, artist, album, and duration are read and displayed. To keep it lightweight, and to ensure the UI's consistency, album artwork will not be displayed. Due to Node.js' limited number of libraries regarding the reading and writing of metadata, and complications with cross-platform compatibility, the metadata of audio files will not be editable, and will only be read/used in a very limited way.

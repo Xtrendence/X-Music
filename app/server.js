@@ -429,68 +429,86 @@ app.on("ready", function() {
 		});
 
 		appExpress.post("/remotePlaySong", (req, res) => {
-			localWindow.webContents.send("remotePlaySong", JSON.stringify(req.body));
+			if(remoteCheck()) {
+				localWindow.webContents.send("remotePlaySong", JSON.stringify(req.body));
+			}
 		});
 
 		appExpress.post("/playSong", (req, res) => {
-
+			if(remoteCheck()) {
+				let type = mime.lookup(req.body.file).toLowerCase();
+				if(type === "audio/mpeg" || type === "audio/x-wav" || type === "audio/ogg" || type === "application/ogg") {
+					fs.readFile(req.body.file, function(error, file) {
+						let base64 = Buffer.from(file).toString("base64");
+						res.send(JSON.stringify({ base64:base64, mime:type }));
+					});
+				}
+			}
 		});
 
 		appExpress.get("/resumeSong", (req, res) => {
-			localWindow.webContents.send("resumeSong");
+			if(remoteCheck()) {
+				localWindow.webContents.send("resumeSong");
+			}
 		});
 
 		appExpress.get("/pauseSong", (req, res) => {
-			localWindow.webContents.send("pauseSong");
+			if(remoteCheck()) {
+				localWindow.webContents.send("pauseSong");
+			}
 		});
 
 		appExpress.get("/getSongs", (req, res) => {
-			if(validJSON(settings)) {
-				let libraryDirectory = JSON.parse(settings).libraryDirectory;
-				if(libraryDirectory !== "") {
-					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
-						if(error) {
-							console.log(error);
-						}
-						else {
-							let songs = [];
-							let count = 0;
-							files.map(file => {
-								metadata.parseFile(file).then(data => {
-									let title = data.common.title;
-									let artist = data.common.artist;
-									let album = data.common.album;
-									let duration = data.format.duration;
-									if(typeof data.common.title === "undefined" || data.common.title.trim() === "") {
-										title = path.basename(file).split(".").slice(0, -1).join(".");
-									}
-									if(typeof data.common.album === "undefined" || data.common.album.trim() === "") {
-										album = "Unknown Album";
-									}
-									if(typeof data.common.artist === "undefined" || data.common.artist.trim() === "") {
-										artist = "Unknown Artist";
-									}
-									songs.push({ file:file, title:title, artist:artist, album:album, duration:duration });
-									count++;
-									if(count === files.length) {
-										res.send(songs);
-									}
-								}).catch(error => {
-									console.log(error);
+			if(remoteCheck()) {
+				if(validJSON(settings)) {
+					let libraryDirectory = JSON.parse(settings).libraryDirectory;
+					if(libraryDirectory !== "") {
+						glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
+							if(error) {
+								console.log(error);
+							}
+							else {
+								let songs = [];
+								let count = 0;
+								files.map(file => {
+									metadata.parseFile(file).then(data => {
+										let title = data.common.title;
+										let artist = data.common.artist;
+										let album = data.common.album;
+										let duration = data.format.duration;
+										if(typeof data.common.title === "undefined" || data.common.title.trim() === "") {
+											title = path.basename(file).split(".").slice(0, -1).join(".");
+										}
+										if(typeof data.common.album === "undefined" || data.common.album.trim() === "") {
+											album = "Unknown Album";
+										}
+										if(typeof data.common.artist === "undefined" || data.common.artist.trim() === "") {
+											artist = "Unknown Artist";
+										}
+										songs.push({ file:file, title:title, artist:artist, album:album, duration:duration });
+										count++;
+										if(count === files.length) {
+											res.send(songs);
+										}
+									}).catch(error => {
+										console.log(error);
+									});
 								});
-							});
-						}
-					});
-				}
-				else {
-					res.send("");
+							}
+						});
+					}
+					else {
+						res.send("");
+					}
 				}
 			}
 		});
 
 		appExpress.get("/getInfo", (req, res) => {
-			let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:true };
-			res.send(info);
+			if(remoteCheck()) {
+				let info = { ip:ip.address(), localPort:localPort, appPort:appPort, settings:settings, playlists:playlists, forceUpdate:true };
+				res.send(info);
+			}
 		});
 
 		function sendInfo(forced) {

@@ -43,3 +43,43 @@
 		height:calc((100vw - 200px) / 2 - 40px - 40px - 40px);
 	}
 }
+@media screen and (max-width:750px) {
+	.titlebar {
+		width:calc(100% - 60px);
+		left:60px;
+	}
+	.title-text {
+		display:none;
+	}
+	.title-button.refresh {
+		left:6px;
+	}
+	.sidebar {
+		padding-top:0;
+		height:100%;
+		width:60px;
+	}
+	.sidebar-text {
+		display:none;
+	}
+	.sidebar-search {
+		display:none;
+	}
+	.listview {
+		width:calc(100% - 60px);
+	}
+	.list-item .title {
+		width:calc(100% - 80px);
+	}
+	.list-item .artist {
+		display:none;
+	}
+	.block-item {
+		min-height:200px;
+	}
+	.block-item svg {
+		width:120px;
+		height:120px;
+		left:calc(50% - 120px / 2);
+	}
+}

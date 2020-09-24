@@ -25,8 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonAlbums = document.getElementsByClassName("sidebar-button albums")[0];
 	let buttonArtists = document.getElementsByClassName("sidebar-button artists")[0];
 	let buttonPlaylists = document.getElementsByClassName("sidebar-button playlists")[0];
+	let buttonSearch = document.getElementsByClassName("sidebar-button search")[0];
+	let buttonPassthrough = document.getElementsByClassName("sidebar-button passthrough")[0];
 
-	let inputSearch = document.getElementsByClassName("sidebar-search")[0];
+	let inputSearch = document.getElementsByClassName("input-search")[0];
 	let inputSlider = document.getElementsByClassName("audio-slider")[0];
 	let inputVolume = document.getElementsByClassName("audio-volume-slider")[0];
 
@@ -55,6 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	getInfo();
+	loopCheck();
+	passthroughCheck();
 
 	buttonRefresh.addEventListener("click", () => {
 		getSongs();
@@ -74,6 +78,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	buttonPlaylists.addEventListener("click", () => {
 		showPage("playlists");
+	});
+
+	buttonSearch.addEventListener("click", () => {
+
+	});
+
+	buttonPassthrough.addEventListener("click", () => {
+		if(passthroughCheck()) {
+			disablePassthrough();
+		}
+		else {
+			enablePassthrough();
+		}
 	});
 
 	inputSearch.addEventListener("keydown", () => {
@@ -100,14 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	svgLoop.addEventListener("click", () => {
 		if(svgLoop.classList.contains("loop-list")) {
-			// Switch to loop Song.
+			window.localStorage.setItem("loop", "song");
 		}
 		else if(svgLoop.classList.contains("loop-song")) {
-			// Switch to loop None.
+			window.localStorage.setItem("loop", "none");
 		}
 		else {
-			// Switch to loop List.
+			window.localStorage.setItem("loop", "list");
 		}
+		loopCheck();
 	});
 
 	svgPrevious.addEventListener("click", () => {
@@ -155,6 +173,47 @@ document.addEventListener("DOMContentLoaded", () => {
 		setVolumeIcon();
 	});
 
+	function loopCheck() {
+		loop = window.localStorage.getItem("loop");
+		if(loop === null) {
+			loop = "none";
+		}
+		svgLoop.setAttribute("class", "loop-icon");
+		svgLoop.classList.add("loop-" + loop);
+		if(loop === "song") {
+			spanLoopIndicator.classList.remove("hidden");
+		}
+		else {
+			spanLoopIndicator.classList.add("hidden");
+		}
+	}
+
+	function passthroughCheck() {
+		let enabled = window.localStorage.getItem("passthrough");
+		if(enabled === null || enabled === "false") {
+			buttonPassthrough.getElementsByTagName("svg")[0].classList.remove("hidden");
+			buttonPassthrough.getElementsByTagName("svg")[1].classList.add("hidden");
+			passthrough = false;
+			return false;
+		}
+		else {
+			buttonPassthrough.getElementsByTagName("svg")[0].classList.add("hidden");
+			buttonPassthrough.getElementsByTagName("svg")[1].classList.remove("hidden");
+			passthrough = true;
+			return true;
+		}
+	}
+
+	function enablePassthrough() {
+		window.localStorage.setItem("passthrough", "true");
+		passthroughCheck();
+	}
+
+	function disablePassthrough() {
+		window.localStorage.setItem("passthrough", "false");
+		passthroughCheck();
+	}
+
 	// TODO: Modify for remote.
 	function processSong(data) {
 		audioFile.src = "data:" + data.mime + ";base64," + data.base64;
@@ -183,15 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
 							hideAudioPlayer();
 							libraryDirectory = settings.libraryDirectory;
 							getSongs();
-						}
-						loop = settings.loop;
-						svgLoop.setAttribute("class", "loop-icon");
-						svgLoop.classList.add("loop-" + settings.loop);
-						if(settings.loop === "song") {
-							spanLoopIndicator.classList.remove("hidden");
-						}
-						else {
-							spanLoopIndicator.classList.add("hidden");
 						}
 						volume = parseInt(settings.volume);
 						audioFile.volume = settings.volume / 100;
@@ -424,11 +474,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				if(passthrough) {
 					let res = xhr.responseText;
 					if(validJSON(res)) {
+						res = JSON.parse(res);
 						processSong(res);
 					}
-				}
-				else {
-
 				}
 				currentSong = file;
 				spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;

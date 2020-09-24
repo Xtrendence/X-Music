@@ -388,6 +388,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		showPage("songs");
 	});
 
+	ipcRenderer.on("remotePlaySong", (error, res) => {
+		if(validJSON(res)) {
+			console.log(res);
+			res = JSON.parse(res);
+			playSong(res.file, res.song);
+		}
+	});
+
 	ipcRenderer.on("playSong", (error, res) => {
 		audioFile.src = "data:" + res.mime + ";base64," + res.base64;
 		audioFile.volume = volume / 100;

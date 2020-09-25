@@ -72,14 +72,19 @@ app.on("ready", function() {
 			resizable:true,
 			frame:false,
 			transparent:false,
-			x:100,
-			y:100,
+			x:80,
+			y:80,
 			webPreferences: {
 				nodeIntegration:true
 			}
 		});
 
 		localWindow.loadURL("http://127.0.0.1:" + localPort);
+		
+		localWindow.on("close", (e) => {
+			e.preventDefault();
+			(process.platform === "darwin") ? app.hide() : app.quit();
+		});
 
 		localExpress.set("view engine", "ejs");
 		localExpress.use("/assets", express.static("assets"));

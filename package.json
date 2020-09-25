@@ -5,7 +5,9 @@
   "main": "app/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron app/server.js"
+    "start": "electron app/server.js",
+    "pack": "build --dir",
+    "dist": "electron-builder -mwl"
   },
   "repository": {
     "type": "git",
@@ -27,5 +29,35 @@
     "mime-types": "^2.1.27",
     "music-metadata": "^7.0.2"
   },
-  "devDependencies": {}
+  "build": {
+    "appId": "com.xtrendence.x-music",
+    "category": "public.app-category.music",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/icon.ico"
+    }
+  },
+  "devDependencies": {
+    "electron-builder": "^22.8.1"
+  }
 }

@@ -472,6 +472,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		playNextSong();
 	});
 
+	ipcRenderer.on("setVolume", (error, res) => {
+		inputVolume.value = res;
+		audioFile.volume = inputVolume.value / 100;
+		volume = parseInt(inputVolume.value);
+		setVolumeIcon();
+	});
+
+	ipcRenderer.on("setSlider", (error, res) => {
+		audioFile.currentTime = res;
+	});
+
 	ipcRenderer.on("notify", (error, res) => {
 		notify(res.title, res.description, res.color, res.duration);
 	});

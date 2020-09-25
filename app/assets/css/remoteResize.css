@@ -82,4 +82,7 @@
 		height:120px;
 		left:calc(50% - 120px / 2);
 	}
+	.audio-player, .audio-banner-wrapper {
+		width:calc(100% - 60px);
+	}
 }

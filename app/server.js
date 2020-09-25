@@ -496,6 +496,20 @@ app.on("ready", function() {
 			}
 		});
 
+		appExpress.post("/setSlider", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("setSlider", req.body.slider);
+				res.send("done");
+			}
+		});
+
+		appExpress.post("/setVolume", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("setVolume", req.body.volume);
+				res.send("done");
+			}
+		});
+
 		appExpress.get("/checkStatus", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("setStatus");

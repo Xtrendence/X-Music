@@ -326,7 +326,7 @@ button, input, svg {
 	height:30px;
 	box-shadow:var(--shadow-darker);
 	background:var(--blue-light);
-	width:calc(100% - 60px);
+	width:calc(100% - 200px);
 }
 .audio-banner {
 	position:absolute;
@@ -363,7 +363,7 @@ button, input, svg {
 	bottom:0;
 	right:0;
 	height:110px;
-	width:calc(100% - 60px);
+	width:calc(100% - 200px);
 	background:var(--blue-medium);
 }
 .audio-player svg {
@@ -463,15 +463,15 @@ button, input, svg {
 }
 .audio-volume-slider {
 	-webkit-appearance:none;
-	width:80px;
-	height:10px;
+	width:calc(50% - 30px - 30px - 30px);
+	height:20px;
 	border-radius:10px;
 	background:var(--purple-lighter);
 	position:absolute;
 	padding:0;
 	margin:0;
 	left:25px;
-	bottom:25px;
+	bottom:20px;
 	outline:none;
 	opacity:0.8;
 	-webkit-transition:0.25s;
@@ -483,13 +483,13 @@ button, input, svg {
 .audio-volume-slider::-webkit-slider-thumb {
 	-webkit-appearance:none;
 	appearance:none;
-	width:10px;
-	height:10px;
+	width:20px;
+	height:20px;
 	border-radius:10px;
 	background:var(--purple-dark);
 }
 .audio-player .no-volume-icon, .audio-player .low-volume-icon, .audio-player .high-volume-icon {
-	left:calc(25px + 80px + 20px);
+	left:calc(50% - 30px - 30px - 30px + 35px);
 	bottom:15px;
 	pointer-events:none;
 }

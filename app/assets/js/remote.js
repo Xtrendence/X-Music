@@ -197,7 +197,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			audioFile.currentTime = inputSlider.value;
 		}
 		else {
-
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", "/setSlider", true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(JSON.stringify({ slider:inputSlider.value }));
 		}
 	});
 
@@ -208,16 +211,21 @@ document.addEventListener("DOMContentLoaded", () => {
 			setVolumeIcon();
 		}
 		else {
-
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", "/setVolume", true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(JSON.stringify({ volume:parseInt(inputVolume.value) }));
 		}
 	});
 
-	let checkSongs = setInterval(() => {
-		getSongs(false, false);
-		if(!passthroughCheck()) {
-			checkStatus();
-		}
-	}, refreshRate);
+	setTimeout(() => {
+		let checkSongs = setInterval(() => {
+			getSongs(false, false);
+			if(!passthroughCheck()) {
+				checkStatus();
+			}
+		}, refreshRate);
+	}, refreshRate + 125);
 
 	function checkStatus() {
 		let xhr = new XMLHttpRequest();
@@ -546,6 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		currentSong = "";
 		audioFile.pause();
 		audioFile.src = "";
+		audioFile.currentTime = 0;
 		divListview.classList.remove("active");
 		divAudioBanner.classList.add("hidden");
 		divAudioPlayer.classList.add("hidden");

@@ -3,6 +3,7 @@ const appPort = 1998;
 const scriptPath = process.cwd() + "\\server.js";
 
 const electron = require("electron");
+const { app, BrowserWindow, screen, ipcMain, dialog, shell, Menu, globalShortcut } = electron;
 
 const express = require("express");
 const localExpress = express();
@@ -19,7 +20,7 @@ const glob = require("glob");
 const metadata = require("music-metadata");
 const body_parser = require("body-parser");
 
-const dataDirectory = path.join(__dirname, "./data/");
+const dataDirectory = path.join(app.getPath("userData"), "X-Music/");
 const settingsFile = dataDirectory + "settings.json";
 const playlistsFile = dataDirectory + "playlists.json";
 
@@ -39,8 +40,6 @@ if(!fs.existsSync(settingsFile)) {
 if(!fs.existsSync(playlistsFile)) {
 	fs.writeFileSync(playlistsFile, "");
 }
-
-const { app, BrowserWindow, screen, ipcMain, dialog, shell, Menu, globalShortcut } = electron;
 
 app.requestSingleInstanceLock();
 app.name = "X:/Music";
@@ -79,8 +78,6 @@ app.on("ready", function() {
 			}
 		});
 
-		localWindow.loadURL("http://127.0.0.1:" + localPort);
-		
 		if(process.platform === "darwin") {
 			globalShortcut.register("Command+Q", () => {
 				app.quit();
@@ -91,10 +88,13 @@ app.on("ready", function() {
 			});
 		}
 
+		localExpress.set("views", path.join(__dirname, "views"));
 		localExpress.set("view engine", "ejs");
-		localExpress.use("/assets", express.static("assets"));
+		localExpress.use("/assets", express.static(path.join(__dirname, "assets")));
 		localExpress.use(body_parser.urlencoded({ extended:true }));
 		localExpress.use(body_parser.json({ limit:"512mb" }));
+		
+		localWindow.loadURL("http://127.0.0.1:" + localPort);
 
 		localExpress.get("/", (req, res) => {
 			res.render("index");
@@ -451,8 +451,9 @@ app.on("ready", function() {
 			(process.platform === "darwin") ? app.hide() : app.quit();
 		});
 
+		appExpress.set("views", path.join(__dirname, "views"));
 		appExpress.set("view engine", "ejs");
-		appExpress.use("/assets", express.static("assets"));
+		appExpress.use("/assets", express.static(path.join(__dirname, "assets")));
 		appExpress.use(body_parser.urlencoded({ extended:true }));
 		appExpress.use(body_parser.json({ limit:"1mb" }));
 

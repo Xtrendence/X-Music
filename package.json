@@ -30,6 +30,7 @@
   },
   "build": {
     "appId": "com.xtrendence.x-music",
+    "asar": true,
     "dmg": {
       "contents": [
         {

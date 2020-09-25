@@ -22,7 +22,6 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "ejs": "^3.1.5",
-    "electron": "^10.1.1",
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "ip": "^1.1.5",
@@ -31,7 +30,6 @@
   },
   "build": {
     "appId": "com.xtrendence.x-music",
-    "category": "public.app-category.music",
     "dmg": {
       "contents": [
         {
@@ -46,6 +44,9 @@
         }
       ]
     },
+    "mac": {
+	  "category": "public.app-category.music"
+    },
     "linux": {
       "target": [
         "AppImage",
@@ -58,6 +59,7 @@
     }
   },
   "devDependencies": {
+  	"electron": "^10.1.1",
     "electron-builder": "^22.8.1"
   }
 }

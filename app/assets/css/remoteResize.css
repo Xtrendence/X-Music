@@ -1,3 +1,11 @@
+@media screen and (min-width:600px) {
+	.audio-volume-slider {
+		width:180px;
+	}
+	.audio-player .no-volume-icon, .audio-player .low-volume-icon, .audio-player .high-volume-icon {
+		left:calc(25px + 180px + 10px);
+	}
+}
 @media screen and (min-width:1100px) {
 	.block-item {
 		width:calc(100% / 3 - 40px - 40px);

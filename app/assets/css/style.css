@@ -425,6 +425,7 @@ button, input, svg {
 	background:var(--blue-light);
 	right:190px;
 	bottom:40px;
+	pointer-events:none;
 }
 .audio-player .previous-icon {
 	right:125px;

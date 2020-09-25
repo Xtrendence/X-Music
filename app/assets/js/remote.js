@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	let loop = "none";
 	let volume = 100;
 
+	let refreshRate = 450;
+
 	let currentSong = "";
 
 	let songs = [];
@@ -60,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	passthroughCheck();
 
 	buttonRefresh.addEventListener("click", () => {
-		getSongs();
+		getSongs(true, false);
 	});
 
 	buttonSongs.addEventListener("click", () => {
@@ -109,11 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 		else {
 			let xhr = new XMLHttpRequest();
-			xhr.addEventListener("readystatechange", () => {
-				if(xhr.readyState === XMLHttpRequest.DONE) {
-					showPause();
-				}
-			});
 			xhr.open("GET", "/resumeSong", true);
 			xhr.send();
 		}
@@ -128,39 +125,58 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 		else {
 			let xhr = new XMLHttpRequest();
-			xhr.addEventListener("readystatechange", () => {
-				if(xhr.readyState === XMLHttpRequest.DONE) {
-					showPlay();
-				}
-			});
 			xhr.open("GET", "/pauseSong", true);
 			xhr.send();
 		}
 	});
 
 	svgLoop.addEventListener("click", () => {
-		if(svgLoop.classList.contains("loop-list")) {
-			window.localStorage.setItem("loop", "song");
-		}
-		else if(svgLoop.classList.contains("loop-song")) {
-			window.localStorage.setItem("loop", "none");
+		if(passthroughCheck()) {
+			if(svgLoop.classList.contains("loop-list")) {
+				window.localStorage.setItem("loop", "song");
+			}
+			else if(svgLoop.classList.contains("loop-song")) {
+				window.localStorage.setItem("loop", "none");
+			}
+			else {
+				window.localStorage.setItem("loop", "list");
+			}
+			loopCheck();
 		}
 		else {
-			window.localStorage.setItem("loop", "list");
+
 		}
-		loopCheck();
 	});
 
 	svgPrevious.addEventListener("click", () => {
-		playPreviousSong();
+		if(passthroughCheck()) {
+			playPreviousSong();
+		}
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.open("GET", "/playPreviousSong", true);
+			xhr.send();
+		}
 	});
 
 	svgNext.addEventListener("click", () => {
-		playNextSong();
+		if(passthroughCheck()) {
+			playNextSong();
+		}
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.open("GET", "/playNextSong", true);
+			xhr.send();
+		}
 	});
 
 	svgCloseAudioPlayer.addEventListener("click", () => {
-		hideAudioPlayer();
+		if(passthroughCheck()) {
+			hideAudioPlayer();
+		}
+		else {
+			stopSong();
+		}
 	});
 
 	audioFile.addEventListener("timeupdate", () => {
@@ -195,6 +211,52 @@ document.addEventListener("DOMContentLoaded", () => {
 		volume = parseInt(inputVolume.value);
 		setVolumeIcon();
 	});
+
+	let checkSongs = setInterval(() => {
+		getSongs(false, false);
+		if(!passthroughCheck()) {
+			checkStatus();
+		}
+	}, refreshRate);
+
+	function checkStatus() {
+		let xhr = new XMLHttpRequest();
+		xhr.addEventListener("readystatechange", () => {
+			if(xhr.readyState === XMLHttpRequest.DONE) {
+				let res = xhr.responseText;
+				if(validJSON(res)) {
+					res = JSON.parse(res);
+					if(!res.song.playing) {
+						showPlay();
+					}
+					else {
+						showPause();
+					}
+					if(!res.song.audioPlayer) {
+						hideAudioPlayer();
+					}
+					else {
+						divListview.classList.add("active");
+						divAudioBanner.classList.remove("hidden");
+						divAudioPlayer.classList.remove("hidden");
+					}
+					spanTimePassed.textContent = res.song.timePassed;
+					spanTimeTotal.textContent = res.song.timeTotal;
+					inputSlider.value = res.song.timeValue;
+					inputSlider.setAttribute("max", res.song.duration);
+					inputVolume.value = res.song.volume;
+					volume = res.song.volume;
+					setVolumeIcon();
+					window.localStorage.setItem("loop", res.song.loop);
+					loopCheck();
+					currentSong = res.song.file;
+					spanAudioBanner.textContent = res.song.title + " - " + res.song.artist + " - " + res.song.album;
+				}
+			}
+		});
+		xhr.open("GET", "/checkStatus", true);
+		xhr.send();
+	}
 
 	function loopCheck() {
 		loop = window.localStorage.getItem("loop");
@@ -264,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
 						if(libraryDirectory !== settings.libraryDirectory || res.forceUpdate) {
 							hideAudioPlayer();
 							libraryDirectory = settings.libraryDirectory;
-							getSongs();
+							getSongs(true, true);
 						}
 						volume = parseInt(settings.volume);
 						audioFile.volume = settings.volume / 100;
@@ -292,21 +354,25 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	// TODO: Modify for remote.
-	function getSongs() {
-		divListview.innerHTML = "";
+	function getSongs(force, fromInfo) {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
 			if(xhr.readyState === XMLHttpRequest.DONE) {
 				let res = xhr.responseText;
-				if(validJSON(res)) {
+				if(validJSON(res) && res !== "done") {
+					if(force && !fromInfo) {
+						getInfo();
+					}
+					divListview.innerHTML = "";
 					songs = JSON.parse(res);
 					sortSongs();
 					showPage("songs");
 				}
 			}
 		});
-		xhr.open("GET", "/getSongs", true);
-		xhr.send();
+		xhr.open("POST", "/getSongs", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify({ force:force }));
 	}
 
 	function listSongs(songs) {
@@ -489,6 +555,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		showPlay();
 	}
 
+	function stopSong() {
+		let xhr = new XMLHttpRequest();
+		xhr.open("GET", "/stopSong", true);
+		xhr.send();
+	}
+
 	// TODO: Modify for remote.
 	function playSong(file, song) {
 		let xhr = new XMLHttpRequest();
@@ -500,18 +572,11 @@ document.addEventListener("DOMContentLoaded", () => {
 						res = JSON.parse(res);
 						processSong(res);
 					}
+					currentSong = file;
+					spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
+					inputSlider.setAttribute("max", song.duration);
+					spanTimeTotal.textContent = formatSeconds(song.duration);
 				}
-				else {
-					audioFile.volume = volume / 100;
-					divListview.classList.add("active");
-					divAudioBanner.classList.remove("hidden");
-					divAudioPlayer.classList.remove("hidden");
-					showPause();
-				}
-				currentSong = file;
-				spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
-				inputSlider.setAttribute("max", song.duration);
-				spanTimeTotal.textContent = formatSeconds(song.duration);
 			}
 		});
 		if(passthroughCheck()) {

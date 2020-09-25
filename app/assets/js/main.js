@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	let volume = 100;
 
 	let currentSong = "";
+	let currentSongDetails = {};
+	let activePage;
+	let activeAlbum;
+	let activeArtist;
+	let activePlaylist;
 
 	let songs = [];
 	let albums = {};
@@ -212,10 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	buttonMoreClosePlaylist.addEventListener("click", () => {
 		hideMoreMenuPlaylist();
 	});
+
 	buttonMoreDeletePlaylist.addEventListener("click", () => {
 		ipcRenderer.send("removePlaylist", divMoreMenuPlaylist.getAttribute("data-name"));
 		hideMoreMenuPlaylist();
 	});
+
 	buttonMoreRenamePlaylist.addEventListener("click", () => {
 		showAddPlaylistMenu("rename", divMoreMenuPlaylist.getAttribute("data-name"));
 		hideMoreMenuPlaylist();
@@ -328,6 +335,38 @@ document.addEventListener("DOMContentLoaded", () => {
 		hideChoosePlaylistMenu();
 	});
 
+	ipcRenderer.on("setStatus", (error, res) => {
+		let playing = false;
+		if(svgPlay.classList.contains("hidden")) {
+			playing = true;
+		}
+		let audioPlayer = false;
+		if(!divAudioPlayer.classList.contains("hidden")) {
+			audioPlayer = true;
+		}
+		let view = {
+			activePage:activePage,
+			activeAlbum:activeAlbum,
+			activeArtist:activeArtist,
+			activePlaylist:activePlaylist
+		};
+		let song = {
+			playing:playing,
+			audioPlayer:audioPlayer,
+			loop:loop,
+			timePassed:spanTimePassed.textContent,
+			timeTotal:spanTimeTotal.textContent,
+			timeValue:inputSlider.value,
+			duration:currentSongDetails.duration,
+			volume:volume,
+			file:currentSong,
+			title:currentSongDetails.title,
+			artist:currentSongDetails.artist,
+			album:currentSongDetails.album
+		};
+		ipcRenderer.send("setStatus", { view:view, song:song });
+	});
+
 	ipcRenderer.on("getInfo", (error, res) => {
 		ipAddress = res.ip;
 		localPort = res.localPort;
@@ -419,6 +458,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			audioFile.pause();
 			showPlay();
 		}
+	});
+
+	ipcRenderer.on("stopSong", () => {
+		hideAudioPlayer();
+	});
+
+	ipcRenderer.on("playPreviousSong", () => {
+		playPreviousSong();
+	});
+
+	ipcRenderer.on("playNextSong", () => {
+		playNextSong();
 	});
 
 	ipcRenderer.on("notify", (error, res) => {
@@ -524,7 +575,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				for(let i = 0; i < album.songs.length; i++) {
 					albumSongs[album.songs[i]] = songs[album.songs[i]];
 				}
-				showPage("songs", { songs:albumSongs });
+				showPage("songs", { songs:albumSongs, album:name });
 			});
 		}
 
@@ -556,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				for(let i = 0; i < artist.songs.length; i++) {
 					artistSongs[artist.songs[i]] = songs[artist.songs[i]];
 				}
-				showPage("songs", { songs:artistSongs });
+				showPage("songs", { songs:artistSongs, artist:name });
 			});
 		}
 
@@ -618,7 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
 						for(let i = 0; i < playlist.indices.length; i++) {
 							playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
 						}
-						showPage("songs", { songs:playlistSongs });
+						showPage("songs", { songs:playlistSongs, playlist:name });
 					}
 				}
 			});
@@ -742,27 +793,38 @@ document.addEventListener("DOMContentLoaded", () => {
 	function playSong(file, song) {
 		ipcRenderer.send("playSong", file);
 		currentSong = file;
+		currentSongDetails = song;
 		spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
 		inputSlider.setAttribute("max", song.duration);
 		spanTimeTotal.textContent = formatSeconds(song.duration);
 	}
 
 	function playPreviousSong() {
-		let listedSongs = document.getElementsByClassName("list-item song");
-		let previous = listedSongs[listedSongs.length - 1];
-		if(document.getElementById(currentSong).previousSibling !== null) {
-			previous = document.getElementById(currentSong).previousSibling;
+		if(loop === "song") {
+			repeatSong();
 		}
-		playSong(previous.id, songs[previous.getAttribute("data-index")]);
+		else {
+			let listedSongs = document.getElementsByClassName("list-item song");
+			let previous = listedSongs[listedSongs.length - 1];
+			if(document.getElementById(currentSong).previousSibling !== null) {
+				previous = document.getElementById(currentSong).previousSibling;
+			}
+			playSong(previous.id, songs[previous.getAttribute("data-index")]);
+		}
 	}
 
 	function playNextSong() {
-		let listedSongs = document.getElementsByClassName("list-item song");
-		let next = listedSongs[0];
-		if(document.getElementById(currentSong).nextSibling !== null) {
-			next = document.getElementById(currentSong).nextSibling;
+		if(loop === "song") {
+			repeatSong();
 		}
-		playSong(next.id, songs[next.getAttribute("data-index")]);
+		else {
+			let listedSongs = document.getElementsByClassName("list-item song");
+			let next = listedSongs[0];
+			if(document.getElementById(currentSong).nextSibling !== null) {
+				next = document.getElementById(currentSong).nextSibling;
+			}
+			playSong(next.id, songs[next.getAttribute("data-index")]);
+		}
 	}
 
 	function repeatSong() {
@@ -873,6 +935,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function showPage(page, args) {
+		activePage = page;
+		activeAlbum = (typeof args !== "undefined") ? (typeof args.album !== "undefined") ? args.album : "" : "";
+		activeArtist = (typeof args !== "undefined") ? (typeof args.artist !== "undefined") ? args.artist : "" : "";
+		activePlaylist = (typeof args !== "undefined") ? (typeof args.playlist !== "undefined") ? args.playlist : "" : "";
+
 		buttonSongs.classList.remove("active");
 		buttonAlbums.classList.remove("active");
 		buttonArtists.classList.remove("active");

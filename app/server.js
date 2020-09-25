@@ -47,6 +47,9 @@ app.name = "X:/Music";
 
 app.on("ready", function() {
 	if(fs.existsSync(settingsFile) && fs.existsSync(playlistsFile)) {
+		let refreshRemote = true;
+		let currentStatus = "";
+
 		let settings = fs.readFileSync(settingsFile, { encoding:"utf-8" });
 		let playlists = fs.readFileSync(playlistsFile, { encoding:"utf-8" });
 
@@ -96,7 +99,8 @@ app.on("ready", function() {
 				if(libraryDirectory !== "") {
 					let watch = fs.watch(libraryDirectory, { recursive:true, persistent:true }, () => {
 						sendInfo(true);
-						localWindow.webContents.send("notify", { title:"Refreshing", description:"Your music library is being updated.", color:"rgb(40,40,40)", duration:5000})
+						localWindow.webContents.send("notify", { title:"Refreshing", description:"Your music library is being updated.", color:"rgb(40,40,40)", duration:5000});
+						refreshRemote = true;
 					});
 					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
 						if(error) {
@@ -154,6 +158,10 @@ app.on("ready", function() {
 			else {
 				localWindow.webContents.send("notify", { title:"Error", description:"Invalid file type.", color:"rgb(40,40,40)", duration:5000})
 			}
+		});
+
+		ipcMain.on("setStatus", (error, req) => {
+			currentStatus = JSON.stringify(req);
 		});
 
 		ipcMain.on("browseFiles",(error, req) => {
@@ -218,6 +226,7 @@ app.on("ready", function() {
 								playlists = JSON.stringify(currentPlaylists);
 								sendInfo(false);
 								localWindow.webContents.send("notify", { title:"Playlist Created", description:"The playlist has been created.", color:"rgb(40,40,40)", duration:5000 });
+								refreshRemote = true;
 							}
 						});
 					}
@@ -249,6 +258,7 @@ app.on("ready", function() {
 								playlists = JSON.stringify(currentPlaylists);
 								sendInfo(false);
 								localWindow.webContents.send("notify", { title:"Playlist Deleted", description:"The playlist has been deleted.", color:"rgb(40,40,40)", duration:5000 });
+								refreshRemote = true;
 							}
 						});
 					}
@@ -281,6 +291,7 @@ app.on("ready", function() {
 									playlists = JSON.stringify(currentPlaylists);
 									sendInfo(true);
 									localWindow.webContents.send("notify", { title:"Playlist Renamed", description:"The playlist has been renamed.", color:"rgb(40,40,40)", duration:5000 });
+									refreshRemote = true;
 								}
 							});
 						}
@@ -321,6 +332,7 @@ app.on("ready", function() {
 									playlists = JSON.stringify(currentPlaylists);
 									sendInfo(true);
 									localWindow.webContents.send("notify", { title:"Song Added", description:"The song has been added to the playlist.", color:"rgb(40,40,40)", duration:5000 });
+									refreshRemote = true;
 								}
 							});
 						}
@@ -358,6 +370,7 @@ app.on("ready", function() {
 								playlists = JSON.stringify(currentPlaylists);
 								sendInfo(true);
 								localWindow.webContents.send("notify", { title:"Song Removed", description:"The song has been removed from the playlist.", color:"rgb(40,40,40)", duration:5000 });
+								refreshRemote = true;
 							}
 						});
 					}
@@ -381,6 +394,7 @@ app.on("ready", function() {
 					settings = defaultSettings;
 					sendInfo(false);
 					localWindow.webContents.send("notify", { title:"Reset", description:"Your settings have been reset.", color:"rgb(40,40,40)", duration:5000 });
+					refreshRemote = true;
 				}
 			});
 		});
@@ -461,8 +475,39 @@ app.on("ready", function() {
 			}
 		});
 
-		appExpress.get("/getSongs", (req, res) => {
+		appExpress.get("/stopSong", (req, res) => {
 			if(remoteCheck()) {
+				localWindow.webContents.send("stopSong");
+				res.send("done");
+			}
+		});
+
+		appExpress.get("/playPreviousSong", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("playPreviousSong");
+				res.send("done");
+			}
+		});
+
+		appExpress.get("/playNextSong", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("playNextSong");
+				res.send("done");
+			}
+		});
+
+		appExpress.get("/checkStatus", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("setStatus");
+				res.send(currentStatus);
+			}
+		});
+
+		appExpress.post("/getSongs", (req, res) => {
+			if(req.body.force) {
+				refreshRemote = true;
+			}
+			if(remoteCheck() && refreshRemote) {
 				if(validJSON(settings)) {
 					let libraryDirectory = JSON.parse(settings).libraryDirectory;
 					if(libraryDirectory !== "") {
@@ -492,6 +537,7 @@ app.on("ready", function() {
 										count++;
 										if(count === files.length) {
 											res.send(songs);
+											refreshRemote = false;
 										}
 									}).catch(error => {
 										console.log(error);
@@ -504,6 +550,9 @@ app.on("ready", function() {
 						res.send("");
 					}
 				}
+			}
+			else {
+				res.send("done");
 			}
 		});
 

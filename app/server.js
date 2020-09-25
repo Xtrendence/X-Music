@@ -414,7 +414,10 @@ app.on("ready", function() {
 		ipcMain.on("openFileLocation", (error, req) => {
 			if(validJSON(settings)) {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
-				if(req.replaceAll("/", "\\").includes(libraryDirectory)) {
+				if(libraryDirectory.includes("\\")) {
+					req = req.replaceAll("/", "\\");
+				}
+				if(req.includes(libraryDirectory)) {
 					shell.showItemInFolder(path.resolve(req));
 				}
 				else {

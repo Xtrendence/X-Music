@@ -273,8 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
 						inputVolume.value = res.song.volume;
 						volume = res.song.volume;
 						setVolumeIcon();
-						window.localStorage.setItem("loop", res.song.loop);
-						loopCheck();
+						if(window.localStorage.getItem("loop") !== res.song.loop) {
+							window.localStorage.setItem("loop", res.song.loop);
+							loopCheck();
+						}
 						currentSong = res.song.file;
 						spanAudioBanner.textContent = res.song.title + " - " + res.song.artist + " - " + res.song.album;
 						hostView = res.view;
@@ -803,17 +805,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function setVolumeIcon() {
-		svgNoVolume.classList.add("hidden");
-		svgLowVolume.classList.add("hidden");
-		svgHighVolume.classList.add("hidden");
-		if(volume === 0) {
+		if(volume === 0 && svgNoVolume.classList.contains("hidden")) {
 			svgNoVolume.classList.remove("hidden");
+			svgLowVolume.classList.add("hidden");
+			svgHighVolume.classList.add("hidden");
 		}
-		else if(volume >= 1 && volume <= 55) {
+		else if(volume >= 1 && volume <= 55 && svgLowVolume.classList.contains("hidden")) {
 			svgLowVolume.classList.remove("hidden");
+			svgNoVolume.classList.add("hidden");
+			svgHighVolume.classList.add("hidden");
 		}
-		else {
+		else if(volume > 55 && svgHighVolume.classList.contains("hidden")) {
 			svgHighVolume.classList.remove("hidden");
+			svgLowVolume.classList.add("hidden");
+			svgNoVolume.classList.add("hidden");
 		}
 	}
 

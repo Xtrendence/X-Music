@@ -149,25 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	svgPrevious.addEventListener("click", () => {
-		if(passthroughCheck()) {
-			playPreviousSong();
-		}
-		else {
-			let xhr = new XMLHttpRequest();
-			xhr.open("GET", "/playPreviousSong", true);
-			xhr.send();
-		}
+		playPreviousSong();
 	});
 
 	svgNext.addEventListener("click", () => {
-		if(passthroughCheck()) {
-			playNextSong();
-		}
-		else {
-			let xhr = new XMLHttpRequest();
-			xhr.open("GET", "/playNextSong", true);
-			xhr.send();
-		}
+		playNextSong();
 	});
 
 	svgCloseAudioPlayer.addEventListener("click", () => {
@@ -180,36 +166,50 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	audioFile.addEventListener("timeupdate", () => {
-		inputSlider.value = audioFile.currentTime;
-		inputSlider.setAttribute("value", audioFile.currentTime);
-		spanTimePassed.textContent = formatSeconds(audioFile.currentTime);
-		if(inputSlider.getAttribute("value") >= audioFile.duration) {
-			inputSlider.setAttribute("value", Math.floor(audioFile.duration));
-			inputSlider.setAttribute("max", Math.floor(audioFile.duration));
-			spanTimePassed.textContent = spanTimeTotal.textContent;
-			showPlay();
+		if(passthroughCheck()) {
+			inputSlider.value = audioFile.currentTime;
+			inputSlider.setAttribute("value", audioFile.currentTime);
+			spanTimePassed.textContent = formatSeconds(audioFile.currentTime);
+			if(inputSlider.getAttribute("value") >= audioFile.duration) {
+				inputSlider.setAttribute("value", Math.floor(audioFile.duration));
+				inputSlider.setAttribute("max", Math.floor(audioFile.duration));
+				spanTimePassed.textContent = spanTimeTotal.textContent;
+				showPlay();
+			}
 		}
 	});
 
 	audioFile.addEventListener("ended", () => {
-		switch(loop) {
-			case "list":
-				playNextSong();
-				break;
-			case "song":
-				repeatSong();
-				break;
+		if(passthroughCheck()) {
+			switch(loop) {
+				case "list":
+					playNextSong();
+					break;
+				case "song":
+					repeatSong();
+					break;
+			}
 		}
 	});
 
 	inputSlider.addEventListener("input", () => {
-		audioFile.currentTime = inputSlider.value;
+		if(passthroughCheck()) {
+			audioFile.currentTime = inputSlider.value;
+		}
+		else {
+
+		}
 	});
 
 	inputVolume.addEventListener("input", () => {
-		audioFile.volume = inputVolume.value / 100;
-		volume = parseInt(inputVolume.value);
-		setVolumeIcon();
+		if(passthroughCheck()) {
+			audioFile.volume = inputVolume.value / 100;
+			volume = parseInt(inputVolume.value);
+			setVolumeIcon();
+		}
+		else {
+
+		}
 	});
 
 	let checkSongs = setInterval(() => {
@@ -299,7 +299,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		passthroughCheck();
 	}
 
-	// TODO: Modify for remote.
 	function processSong(data) {
 		audioFile.src = "data:" + data.mime + ";base64," + data.base64;
 		audioFile.volume = volume / 100;
@@ -311,7 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		showPause();
 	}
 
-	// TODO: Modify for remote.
 	function getInfo() {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
@@ -353,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		xhr.send();
 	}
 
-	// TODO: Modify for remote.
 	function getSongs(force, fromInfo) {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
@@ -561,7 +558,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		xhr.send();
 	}
 
-	// TODO: Modify for remote.
 	function playSong(file, song) {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
@@ -590,21 +586,35 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function playPreviousSong() {
-		let listedSongs = document.getElementsByClassName("list-item song");
-		let previous = listedSongs[listedSongs.length - 1];
-		if(document.getElementById(currentSong).previousSibling !== null) {
-			previous = document.getElementById(currentSong).previousSibling;
+		if(passthroughCheck()) {
+			let listedSongs = document.getElementsByClassName("list-item song");
+			let previous = listedSongs[listedSongs.length - 1];
+			if(document.getElementById(currentSong).previousSibling !== null) {
+				previous = document.getElementById(currentSong).previousSibling;
+			}
+			playSong(previous.id, songs[previous.getAttribute("data-index")]);
 		}
-		playSong(previous.id, songs[previous.getAttribute("data-index")]);
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.open("GET", "/playPreviousSong", true);
+			xhr.send();
+		}
 	}
 
 	function playNextSong() {
-		let listedSongs = document.getElementsByClassName("list-item song");
-		let next = listedSongs[0];
-		if(document.getElementById(currentSong).nextSibling !== null) {
-			next = document.getElementById(currentSong).nextSibling;
+		if(passthroughCheck()) {
+			let listedSongs = document.getElementsByClassName("list-item song");
+			let next = listedSongs[0];
+			if(document.getElementById(currentSong).nextSibling !== null) {
+				next = document.getElementById(currentSong).nextSibling;
+			}
+			playSong(next.id, songs[next.getAttribute("data-index")]);
 		}
-		playSong(next.id, songs[next.getAttribute("data-index")]);
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.open("GET", "/playNextSong", true);
+			xhr.send();
+		}
 	}
 
 	function repeatSong() {

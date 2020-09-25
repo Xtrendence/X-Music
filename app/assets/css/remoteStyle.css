@@ -87,8 +87,8 @@ button, input, svg {
 	overflow:hidden;
 	background:var(--purple-medium);
 	position:absolute;
-	height:28px;
-	width:28px;
+	height:40px;
+	width:40px;
 	-webkit-app-region:no-drag;
 	top:6px;
 }
@@ -145,11 +145,6 @@ button, input, svg {
 	vertical-align:middle;
 	margin-top:-4px;
 }
-.sidebar-button.search {
-	position:absolute;
-	bottom:60px;
-	left:0;
-}
 .sidebar-button.passthrough {
 	position:absolute;
 	bottom:0;
@@ -158,15 +153,16 @@ button, input, svg {
 
 .input-search {
 	position:absolute;
-	left:20px;
-	bottom:20px;
+	right:6px;
+	top:6px;
 	height:40px;
 	font-size:16px;
 	border-radius:10px;
 	padding:0 10px 0 10px;
-	width:calc(100% - 60px);
+	width:200px;
 	color:var(--text-light);
-	background:var(--purple-medium);
+	background:var(--purple-dark);
+	z-index:92;
 }
 .input-search::placeholder {
 	color:var(--text-darker);
@@ -175,20 +171,20 @@ button, input, svg {
 .listview {
 	position:absolute;
 	z-index:89;
-	top:40px;
+	top:52px;
 	right:0;
 	overflow-x:hidden;
 	overflow-y:scroll;
 	-webkit-overflow-scrolling:touch;
 	scroll-behavior:smooth;
 	width:calc(100% - 200px);
-	height:calc(100% - 40px);
+	height:calc(100% - 52px);
 	background:var(--purple-medium);
 	background:linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 	background:-webkit-linear-gradient(270deg, var(--purple-medium) 0%, var(--purple-dark) 100%);
 }
 .listview.active {
-	height:calc(100% - 40px - 110px - 30px);
+	height:calc(100% - 52px - 110px - 30px);
 }
 .list-item {
 	display:block;

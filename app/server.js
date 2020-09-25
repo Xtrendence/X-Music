@@ -517,6 +517,13 @@ app.on("ready", function() {
 			}
 		});
 
+		appExpress.get("/setLoop", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("setLoop");
+				res.send("done");
+			}
+		});
+
 		appExpress.get("/checkStatus", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("setStatus");

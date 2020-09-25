@@ -429,7 +429,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("remotePlaySong", (error, res) => {
 		if(validJSON(res)) {
-			console.log(res);
 			res = JSON.parse(res);
 			playSong(res.file, res.song);
 		}
@@ -481,6 +480,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	ipcRenderer.on("setSlider", (error, res) => {
 		audioFile.currentTime = res;
+	});
+
+	ipcRenderer.on("setLoop", () => {
+		if(svgLoop.classList.contains("loop-list")) {
+			ipcRenderer.send("loopSetting", "song");
+		}
+		else if(svgLoop.classList.contains("loop-song")) {
+			ipcRenderer.send("loopSetting", "none");
+		}
+		else {
+			ipcRenderer.send("loopSetting", "list");
+		}
 	});
 
 	ipcRenderer.on("setView", (error, res) => {

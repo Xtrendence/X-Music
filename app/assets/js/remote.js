@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	let buttonAlbums = document.getElementsByClassName("sidebar-button albums")[0];
 	let buttonArtists = document.getElementsByClassName("sidebar-button artists")[0];
 	let buttonPlaylists = document.getElementsByClassName("sidebar-button playlists")[0];
-	let buttonSearch = document.getElementsByClassName("sidebar-button search")[0];
 	let buttonPassthrough = document.getElementsByClassName("sidebar-button passthrough")[0];
 
 	let inputSearch = document.getElementsByClassName("input-search")[0];
@@ -83,11 +82,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	setTimeout(() => {
 		let refreshStatus = setInterval(() => {
-			checkStatus();
+			if(!passthroughCheck()) {
+				checkStatus();
+			}
 		}, refreshRateStatus);
 	}, refreshRateStatus + 125);
 
 	buttonRefresh.addEventListener("click", () => {
+		divListview.innerHTML = "";
 		getSongs(true, false);
 	});
 
@@ -105,10 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	buttonPlaylists.addEventListener("click", () => {
 		showPage("playlists");
-	});
-
-	buttonSearch.addEventListener("click", () => {
-
 	});
 
 	buttonPassthrough.addEventListener("click", () => {
@@ -170,7 +168,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			loopCheck();
 		}
 		else {
-
+			let xhr = new XMLHttpRequest();
+			xhr.open("GET", "/setLoop", true);
+			xhr.send();
 		}
 	});
 
@@ -245,48 +245,50 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	function checkStatus() {
-		let xhr = new XMLHttpRequest();
-		xhr.addEventListener("readystatechange", () => {
-			if(xhr.readyState === XMLHttpRequest.DONE) {
-				let res = xhr.responseText;
-				if(validJSON(res)) {
-					res = JSON.parse(res);
-					if(!res.song.playing) {
-						showPlay();
+		if(!passthroughCheck()) {
+			let xhr = new XMLHttpRequest();
+			xhr.addEventListener("readystatechange", () => {
+				if(xhr.readyState === XMLHttpRequest.DONE) {
+					let res = xhr.responseText;
+					if(validJSON(res)) {
+						res = JSON.parse(res);
+						if(!res.song.playing) {
+							showPlay();
+						}
+						else {
+							showPause();
+						}
+						if(!res.song.audioPlayer) {
+							hideAudioPlayer();
+						}
+						else {
+							divListview.classList.add("active");
+							divAudioBanner.classList.remove("hidden");
+							divAudioPlayer.classList.remove("hidden");
+						}
+						spanTimePassed.textContent = res.song.timePassed;
+						spanTimeTotal.textContent = res.song.timeTotal;
+						inputSlider.value = res.song.timeValue;
+						inputSlider.setAttribute("max", res.song.duration);
+						inputVolume.value = res.song.volume;
+						volume = res.song.volume;
+						setVolumeIcon();
+						window.localStorage.setItem("loop", res.song.loop);
+						loopCheck();
+						currentSong = res.song.file;
+						spanAudioBanner.textContent = res.song.title + " - " + res.song.artist + " - " + res.song.album;
+						hostView = res.view;
+						syncView();
 					}
-					else {
-						showPause();
-					}
-					if(!res.song.audioPlayer) {
-						hideAudioPlayer();
-					}
-					else {
-						divListview.classList.add("active");
-						divAudioBanner.classList.remove("hidden");
-						divAudioPlayer.classList.remove("hidden");
-					}
-					spanTimePassed.textContent = res.song.timePassed;
-					spanTimeTotal.textContent = res.song.timeTotal;
-					inputSlider.value = res.song.timeValue;
-					inputSlider.setAttribute("max", res.song.duration);
-					inputVolume.value = res.song.volume;
-					volume = res.song.volume;
-					setVolumeIcon();
-					window.localStorage.setItem("loop", res.song.loop);
-					loopCheck();
-					currentSong = res.song.file;
-					spanAudioBanner.textContent = res.song.title + " - " + res.song.artist + " - " + res.song.album;
-					hostView = res.view;
-					syncView();
 				}
-			}
-		});
-		xhr.open("GET", "/checkStatus", true);
-		xhr.send();
+			});
+			xhr.open("GET", "/checkStatus", true);
+			xhr.send();
+		}
 	}
 
 	function syncView() {
-		if(hostView !== "" && Object.keys(remoteView).length !== 0 && !suspendSync) {
+		if(hostView !== "" && Object.keys(remoteView).length !== 0 && !suspendSync && !passthroughCheck()) {
 			if(hostView.activePage !== remoteView.activePage && typeof hostView.activePage !== "undefined" && hostView.activeAlbum === "" && hostView.activeArtist === "" && hostView.activePlaylist === "") {
 				showPage(hostView.activePage);
 			}
@@ -312,22 +314,24 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function setView() {
-		suspendSync = true;
-		let xhr = new XMLHttpRequest();
-		xhr.addEventListener("readystatechange", () => {
-			if(xhr.readyState === XMLHttpRequest.DONE) {
-				let timeout = suspensionTime;
-				if(remoteView.activePage === "songs") {
-					timeout += 1000;
+		if(!passthroughCheck()) {
+			suspendSync = true;
+			let xhr = new XMLHttpRequest();
+			xhr.addEventListener("readystatechange", () => {
+				if(xhr.readyState === XMLHttpRequest.DONE) {
+					let timeout = suspensionTime;
+					if(remoteView.activePage === "songs") {
+						timeout += 1000;
+					}
+					setTimeout(() => {
+						suspendSync = false;
+					}, timeout);
 				}
-				setTimeout(() => {
-					suspendSync = false;
-				}, timeout);
-			}
-		});
-		xhr.open("POST", "/setView", true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.send(JSON.stringify({ view:remoteView }));
+			});
+			xhr.open("POST", "/setView", true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(JSON.stringify({ view:remoteView }));
+		}
 	}
 
 	function loopCheck() {
@@ -363,12 +367,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		window.localStorage.setItem("passthrough", "true");
 		hideAudioPlayer();
 		passthroughCheck();
+		showPage("songs");
 	}
 
 	function disablePassthrough() {
 		window.localStorage.setItem("passthrough", "false");
 		hideAudioPlayer();
 		passthroughCheck();
+		showPage("songs");
 	}
 
 	function processSong(data) {

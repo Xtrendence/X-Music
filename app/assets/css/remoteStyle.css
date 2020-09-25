@@ -307,16 +307,6 @@ button, input, svg {
 .block-item .artist, .block-item .songs {
 	bottom:20px;
 }
-.block-item.playlist {
-	position:absolute;
-	width:32px;
-	height:32px;
-	bottom:20px;
-	right:10px;
-	left:auto;
-	top:auto;
-	transition:transform 0.25s;
-}
 
 .audio-banner-wrapper {
 	position:absolute;

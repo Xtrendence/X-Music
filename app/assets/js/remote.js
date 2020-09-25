@@ -61,6 +61,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	loopCheck();
 	passthroughCheck();
 
+	setTimeout(() => {
+		let checkSongs = setInterval(() => {
+			getSongs(false, false);
+			getPlaylists(false, false);
+			if(!passthroughCheck()) {
+				checkStatus();
+			}
+		}, refreshRate);
+	}, refreshRate + 125);
+
 	buttonRefresh.addEventListener("click", () => {
 		getSongs(true, false);
 	});
@@ -218,15 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	setTimeout(() => {
-		let checkSongs = setInterval(() => {
-			getSongs(false, false);
-			if(!passthroughCheck()) {
-				checkStatus();
-			}
-		}, refreshRate);
-	}, refreshRate + 125);
-
 	function checkStatus() {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
@@ -333,6 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
 							hideAudioPlayer();
 							libraryDirectory = settings.libraryDirectory;
 							getSongs(true, true);
+							getPlaylists(true, true);
 						}
 						volume = parseInt(settings.volume);
 						audioFile.volume = settings.volume / 100;
@@ -377,6 +379,35 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 		xhr.open("POST", "/getSongs", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify({ force:force }));
+	}
+
+	function getPlaylists(force, fromInfo) {
+		let xhr = new XMLHttpRequest();
+		xhr.addEventListener("readystatechange", () => {
+			if(xhr.readyState === XMLHttpRequest.DONE) {
+				let res = xhr.responseText;
+				if(validJSON(res) && res !== "done") {
+					if(force && !fromInfo) {
+						getInfo();
+					}
+					let activePage = document.getElementsByClassName("sidebar-button active")[0];
+					if(playlists !== JSON.parse(res)) {
+						playlists = JSON.parse(res);
+						let playlistNames = Object.keys(playlists);
+						for(let i = 0; i < playlistNames.length; i++) {
+							playlists[playlistNames[i]].indices = [];
+						}
+						if(typeof activePage !== "undefined") {
+							if(activePage.classList.contains("playlists")) {
+								showPage("playlists");
+							}
+						}
+					}
+				}
+			}
+		});
+		xhr.open("GET", "/getPlaylists", true);
 		xhr.send(JSON.stringify({ force:force }));
 	}
 

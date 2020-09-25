@@ -795,6 +795,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		divChoosePlaylistMenu.innerHTML = "";
 		let song = songs[index];
 		let file = song.file.replace(libraryDirectory, "");
+		if(libraryDirectory.includes("\\") && file.includes("/")) {
+			file = file.replace(libraryDirectory.replaceAll("\\", "/"), "");
+		}
 		let keys = Object.keys(playlists).sort((a, b) => a.localeCompare(b));
 		for(let i = 0; i < keys.length; i++) {
 			let name = keys[i];

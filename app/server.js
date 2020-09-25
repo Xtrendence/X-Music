@@ -40,7 +40,7 @@ if(!fs.existsSync(playlistsFile)) {
 	fs.writeFileSync(playlistsFile, "");
 }
 
-const { app, BrowserWindow, screen, ipcMain, dialog, shell } = electron;
+const { app, BrowserWindow, screen, ipcMain, dialog, shell, Menu, globalShortcut } = electron;
 
 app.requestSingleInstanceLock();
 app.name = "X:/Music";
@@ -81,10 +81,15 @@ app.on("ready", function() {
 
 		localWindow.loadURL("http://127.0.0.1:" + localPort);
 		
-		localWindow.on("close", (e) => {
-			e.preventDefault();
-			(process.platform === "darwin") ? app.hide() : app.quit();
-		});
+		if(process.platform === "darwin") {
+			globalShortcut.register("Command+Q", () => {
+				app.quit();
+			});
+			
+			globalShortcut.register("Command+W", () => {
+				app.hide();
+			});
+		}
 
 		localExpress.set("view engine", "ejs");
 		localExpress.use("/assets", express.static("assets"));

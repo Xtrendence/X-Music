@@ -799,7 +799,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		for(let i = 0; i < keys.length; i++) {
 			let name = keys[i];
 			let playlist = playlists[keys[i]];
-			if(!playlist.songs.includes(file) && action === "add" || playlist.songs.includes(file) && action === "remove") {
+			if(!playlist.songs.includes(file.replace(libraryDirectory, "")) && action === "add" || playlist.songs.includes(file.replace(libraryDirectory, "")) && action === "remove") {
 				let element = document.createElement("div");
 				element.classList.add("list-item");
 				element.classList.add("noselect");

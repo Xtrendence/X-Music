@@ -431,6 +431,7 @@ app.on("ready", function() {
 		appExpress.post("/remotePlaySong", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("remotePlaySong", JSON.stringify(req.body));
+				res.send("done");
 			}
 		});
 
@@ -449,12 +450,14 @@ app.on("ready", function() {
 		appExpress.get("/resumeSong", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("resumeSong");
+				res.send("done");
 			}
 		});
 
 		appExpress.get("/pauseSong", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("pauseSong");
+				res.send("done");
 			}
 		});
 

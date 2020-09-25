@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	let libraryDirectory = "";
 	let loop = "none";
 	let volume = 100;
-	let passthrough = false;
 
 	let currentSong = "";
 
@@ -102,16 +101,40 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	svgPlay.addEventListener("click", () => {
-		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
-			audioFile.play();
-			showPause();
+		if(passthroughCheck()) {
+			if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+				audioFile.play();
+				showPause();
+			}
+		}
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.addEventListener("readystatechange", () => {
+				if(xhr.readyState === XMLHttpRequest.DONE) {
+					showPause();
+				}
+			});
+			xhr.open("GET", "/resumeSong", true);
+			xhr.send();
 		}
 	});
 
 	svgPause.addEventListener("click", () => {
-		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
-			audioFile.pause();
-			showPlay();
+		if(passthroughCheck()) {
+			if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+				audioFile.pause();
+				showPlay();
+			}
+		}
+		else {
+			let xhr = new XMLHttpRequest();
+			xhr.addEventListener("readystatechange", () => {
+				if(xhr.readyState === XMLHttpRequest.DONE) {
+					showPlay();
+				}
+			});
+			xhr.open("GET", "/pauseSong", true);
+			xhr.send();
 		}
 	});
 
@@ -193,24 +216,24 @@ document.addEventListener("DOMContentLoaded", () => {
 		if(enabled === null || enabled === "false") {
 			buttonPassthrough.getElementsByTagName("svg")[0].classList.remove("hidden");
 			buttonPassthrough.getElementsByTagName("svg")[1].classList.add("hidden");
-			passthrough = false;
 			return false;
 		}
 		else {
 			buttonPassthrough.getElementsByTagName("svg")[0].classList.add("hidden");
 			buttonPassthrough.getElementsByTagName("svg")[1].classList.remove("hidden");
-			passthrough = true;
 			return true;
 		}
 	}
 
 	function enablePassthrough() {
 		window.localStorage.setItem("passthrough", "true");
+		hideAudioPlayer();
 		passthroughCheck();
 	}
 
 	function disablePassthrough() {
 		window.localStorage.setItem("passthrough", "false");
+		hideAudioPlayer();
 		passthroughCheck();
 	}
 
@@ -471,12 +494,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		let xhr = new XMLHttpRequest();
 		xhr.addEventListener("readystatechange", () => {
 			if(xhr.readyState === XMLHttpRequest.DONE) {
-				if(passthrough) {
+				if(passthroughCheck()) {
 					let res = xhr.responseText;
 					if(validJSON(res)) {
 						res = JSON.parse(res);
 						processSong(res);
 					}
+				}
+				else {
+					audioFile.volume = volume / 100;
+					divListview.classList.add("active");
+					divAudioBanner.classList.remove("hidden");
+					divAudioPlayer.classList.remove("hidden");
+					showPause();
 				}
 				currentSong = file;
 				spanAudioBanner.textContent = song.title + " - " + song.artist + " - " + song.album;
@@ -484,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				spanTimeTotal.textContent = formatSeconds(song.duration);
 			}
 		});
-		if(passthrough) {
+		if(passthroughCheck()) {
 			xhr.open("POST", "/playSong", true);
 		}
 		else {

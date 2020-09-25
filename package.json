@@ -45,7 +45,7 @@
       ]
     },
     "mac": {
-	  "category": "public.app-category.music"
+      "category": "public.app-category.music"
     },
     "linux": {
       "target": [
@@ -59,7 +59,7 @@
     }
   },
   "devDependencies": {
-  	"electron": "^10.1.1",
+    "electron": "^10.1.1",
     "electron-builder": "^22.8.1"
   }
 }

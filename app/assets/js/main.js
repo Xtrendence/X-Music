@@ -483,9 +483,42 @@ document.addEventListener("DOMContentLoaded", () => {
 		audioFile.currentTime = res;
 	});
 
+	ipcRenderer.on("setView", (error, res) => {
+		syncView(res.view);
+	});
+
 	ipcRenderer.on("notify", (error, res) => {
 		notify(res.title, res.description, res.color, res.duration);
 	});
+
+	function syncView(remoteView) {
+		if(Object.keys(remoteView).length !== 0) {
+			if(activePage !== remoteView.activePage && typeof remoteView.activePage !== "undefined" && remoteView.activeAlbum === "" && remoteView.activeArtist === "" && remoteView.activePlaylist === "") {
+				showPage(remoteView.activePage);
+			}
+			if(activePage === remoteView.activePage && remoteView.activeAlbum === "" && remoteView.activeArtist === "" && remoteView.activePlaylist === "") {
+				showPage(remoteView.activePage);
+			}
+			if(activeAlbum !== remoteView.activeAlbum && typeof remoteView.activeAlbum !== "undefined" && remoteView.activeAlbum !== "") {
+				let item = document.getElementById(remoteView.activeAlbum);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+			if(activeArtist !== remoteView.activeArtist && typeof remoteView.activeArtist !== "undefined" && remoteView.activeArtist !== "") {
+				let item = document.getElementById(remoteView.activeArtist);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+			if(activePlaylist !== remoteView.activePlaylist && typeof remoteView.activePlaylist !== "undefined" && remoteView.activePlaylist !== "") {
+				let item = document.getElementById(remoteView.activePlaylist);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+		}
+	}
 
 	function getInfo() {
 		ipcRenderer.send("getInfo");

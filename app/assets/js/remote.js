@@ -8,10 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	let refreshRateSongs = 450;
 	let refreshRateStatus = 200;
 
+	let suspendSync = false;
+	let suspensionTime = 1500;
+
 	let currentSong = "";
 
 	let hostView = "";
-	let remoteView = {};
+	let remoteView = {
+		activePage:"songs",
+		activeAlbum:"",
+		activeArtist:"",
+		activePlaylist:""
+	};
 
 	let songs = [];
 	let albums = {};
@@ -64,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	getInfo();
 	loopCheck();
 	passthroughCheck();
+	setView();
 
 	setTimeout(() => {
 		let refreshSongs = setInterval(() => {
@@ -277,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function syncView() {
-		if(hostView !== "" && Object.keys(remoteView).length !== 0) {
+		if(hostView !== "" && Object.keys(remoteView).length !== 0 && !suspendSync) {
 			if(hostView.activePage !== remoteView.activePage && typeof hostView.activePage !== "undefined" && hostView.activeAlbum === "" && hostView.activeArtist === "" && hostView.activePlaylist === "") {
 				showPage(hostView.activePage);
 			}
@@ -300,6 +309,25 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 			}
 		}
+	}
+
+	function setView() {
+		suspendSync = true;
+		let xhr = new XMLHttpRequest();
+		xhr.addEventListener("readystatechange", () => {
+			if(xhr.readyState === XMLHttpRequest.DONE) {
+				let timeout = suspensionTime;
+				if(remoteView.activePage === "songs") {
+					timeout += 1000;
+				}
+				setTimeout(() => {
+					suspendSync = false;
+				}, timeout);
+			}
+		});
+		xhr.open("POST", "/setView", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify({ view:remoteView }));
 	}
 
 	function loopCheck() {
@@ -531,8 +559,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				for(let i = 0; i < album.songs.length; i++) {
 					albumSongs[album.songs[i]] = songs[album.songs[i]];
 				}
-				showPage("songs", { songs:albumSongs });
+				showPage("songs", { songs:albumSongs, album:name });
 				remoteView.activeAlbum = name;
+				setView();
 			});
 		}
 
@@ -564,8 +593,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				for(let i = 0; i < artist.songs.length; i++) {
 					artistSongs[artist.songs[i]] = songs[artist.songs[i]];
 				}
-				showPage("songs", { songs:artistSongs });
+				showPage("songs", { songs:artistSongs, artist:name });
 				remoteView.activeArtist = name;
+				setView();
 			});
 		}
 
@@ -611,8 +641,9 @@ document.addEventListener("DOMContentLoaded", () => {
 						for(let i = 0; i < playlist.indices.length; i++) {
 							playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
 						}
-						showPage("songs", { songs:playlistSongs });
+						showPage("songs", { songs:playlistSongs, playlist:name });
 						remoteView.activePlaylist = name;
+						setView();
 					}
 				}
 			});
@@ -792,6 +823,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function showPage(page, args) {
 		remoteView.activePage = page;
+		remoteView.activeAlbum = (typeof args !== "undefined") ? (typeof args.album !== "undefined") ? args.album : "" : "";
+		remoteView.activeArtist = (typeof args !== "undefined") ? (typeof args.artist !== "undefined") ? args.artist : "" : "";
+		remoteView.activePlaylist = (typeof args !== "undefined") ? (typeof args.playlist !== "undefined") ? args.playlist : "" : "";
+		setView();
 
 		buttonSongs.classList.remove("active");
 		buttonAlbums.classList.remove("active");

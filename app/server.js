@@ -524,6 +524,13 @@ app.on("ready", function() {
 			}
 		});
 
+		appExpress.post("/setView", (req, res) => {
+			if(remoteCheck()) {
+				localWindow.webContents.send("setView", req.body);
+				res.send("done");
+			}
+		});
+
 		appExpress.post("/getSongs", (req, res) => {
 			if(req.body.force) {
 				refreshRemoteSongs = true;

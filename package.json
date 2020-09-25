@@ -1,5 +1,5 @@
 {
-  "name": "x-music",
+  "name": "X-Music",
   "version": "1.0.0",
   "description": "A cross-platform music player running on Node.js (with Electron).",
   "main": "app/server.js",

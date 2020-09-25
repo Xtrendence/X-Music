@@ -5,9 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	let loop = "none";
 	let volume = 100;
 
-	let refreshRate = 450;
+	let refreshRateSongs = 450;
+	let refreshRateStatus = 200;
 
 	let currentSong = "";
+
+	let hostView = "";
+	let remoteView = {};
 
 	let songs = [];
 	let albums = {};
@@ -62,14 +66,17 @@ document.addEventListener("DOMContentLoaded", () => {
 	passthroughCheck();
 
 	setTimeout(() => {
-		let checkSongs = setInterval(() => {
+		let refreshSongs = setInterval(() => {
 			getSongs(false, false);
 			getPlaylists(false, false);
-			if(!passthroughCheck()) {
-				checkStatus();
-			}
-		}, refreshRate);
-	}, refreshRate + 125);
+		}, refreshRateSongs);
+	}, refreshRateSongs + 125);
+
+	setTimeout(() => {
+		let refreshStatus = setInterval(() => {
+			checkStatus();
+		}, refreshRateStatus);
+	}, refreshRateStatus + 125);
 
 	buttonRefresh.addEventListener("click", () => {
 		getSongs(true, false);
@@ -260,11 +267,39 @@ document.addEventListener("DOMContentLoaded", () => {
 					loopCheck();
 					currentSong = res.song.file;
 					spanAudioBanner.textContent = res.song.title + " - " + res.song.artist + " - " + res.song.album;
+					hostView = res.view;
+					syncView();
 				}
 			}
 		});
 		xhr.open("GET", "/checkStatus", true);
 		xhr.send();
+	}
+
+	function syncView() {
+		if(hostView !== "" && Object.keys(remoteView).length !== 0) {
+			if(hostView.activePage !== remoteView.activePage && typeof hostView.activePage !== "undefined" && hostView.activeAlbum === "" && hostView.activeArtist === "" && hostView.activePlaylist === "") {
+				showPage(hostView.activePage);
+			}
+			if(hostView.activeAlbum !== remoteView.activeAlbum && typeof hostView.activeAlbum !== "undefined" && hostView.activeAlbum !== "") {
+				let item = document.getElementById(hostView.activeAlbum);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+			if(hostView.activeArtist !== remoteView.activeArtist && typeof hostView.activeArtist !== "undefined" && hostView.activeArtist !== "") {
+				let item = document.getElementById(hostView.activeArtist);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+			if(hostView.activePlaylist !== remoteView.activePlaylist && typeof hostView.activePlaylist !== "undefined" && hostView.activePlaylist !== "") {
+				let item = document.getElementById(hostView.activePlaylist);
+				if(typeof item !== "undefined" && item.classList.contains("block-item")) {
+					item.click();
+				}
+			}
+		}
 	}
 
 	function loopCheck() {
@@ -497,6 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					albumSongs[album.songs[i]] = songs[album.songs[i]];
 				}
 				showPage("songs", { songs:albumSongs });
+				remoteView.activeAlbum = name;
 			});
 		}
 
@@ -529,6 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					artistSongs[artist.songs[i]] = songs[artist.songs[i]];
 				}
 				showPage("songs", { songs:artistSongs });
+				remoteView.activeArtist = name;
 			});
 		}
 
@@ -575,6 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
 							playlistSongs[playlist.indices[i]] = songs[playlist.indices[i]];
 						}
 						showPage("songs", { songs:playlistSongs });
+						remoteView.activePlaylist = name;
 					}
 				}
 			});
@@ -753,6 +791,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function showPage(page, args) {
+		remoteView.activePage = page;
+
 		buttonSongs.classList.remove("active");
 		buttonAlbums.classList.remove("active");
 		buttonArtists.classList.remove("active");

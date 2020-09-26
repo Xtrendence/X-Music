@@ -22,4 +22,14 @@ If you encounter a bug, it'll most likely be due to something being wrong with t
 
 It should be, yes. On the server-side, there aren't any shell commands or any user input that could be used to gain access to anything X:/Music shouldn't have access to. For security reasons, audio files cannot be deleted or modified in any way through the app. The only files X:/Music writes to are the "settings.json" and "playlists.json" files in the "data" directory. Besides that, X:/Music doesn't write data anywhere else on the OS, and as far as reading is concerned, only MP3, WAV, and OGG files are supported, so it shouldn't be possible to trick it into reading other file types unless the server-side code is modified. 
 
+## Download
+
+|Platform|Download Link|
+|-------------|------------------|
+|**Mac**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Mac-X-Music-1.0.0.dmg|
+|**Linux**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Linux-X-Music-1.0.0.AppImage|
+|**Windows**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Windows-X-Music.Setup.1.0.0.exe|
+
+*Please note that on Mac it might say that the application can't be opened because it's from an unidentified developer. To fix this, simply open **System Preferences**, go to **Security & Privacy**, click on the **General** tab, and find the **Open Anyway** button at the bottom of the page.*
+
 ![X:/Music](https://i.imgur.com/ZzB0vN3.png)

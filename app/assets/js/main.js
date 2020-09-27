@@ -125,6 +125,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		if((e.ctrlKey && e.key.toLowerCase() === "f" || e.metaKey && e.key.toLowerCase() === "f") && !inputSearch.classList.contains("hidden")) {
 			inputSearch.focus();
 		}
+		if(e.key === " " && inputSearch !== document.activeElement) {
+			e.preventDefault();
+			if(!divAudioPlayer.classList.contains("hidden")) {
+				if(!svgPause.classList.contains("hidden")) {
+					if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+						audioFile.pause();
+						showPlay();
+					}
+				}
+				else {
+					if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+						audioFile.play();
+						showPause();
+					}
+				}
+			}
+		}
 	});
 
 	window.addEventListener("resize", () => {
@@ -304,6 +321,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			inputSlider.setAttribute("value", Math.floor(audioFile.duration));
 			inputSlider.setAttribute("max", Math.floor(audioFile.duration));
 			spanTimePassed.textContent = spanTimeTotal.textContent;
+			showPlay();
+		}
+	});
+
+	audioFile.addEventListener("play", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
+			showPause();
+		}
+	});
+
+	audioFile.addEventListener("pause", () => {
+		if(audioFile.src !== "" && typeof audioFile.src !== "undefined") {
 			showPlay();
 		}
 	});

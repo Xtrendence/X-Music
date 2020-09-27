@@ -3,6 +3,7 @@ const appPort = 1998;
 const scriptPath = process.cwd() + "\\server.js";
 
 const electron = require("electron");
+const localShortcut = require("electron-localshortcut");
 const { app, BrowserWindow, screen, ipcMain, dialog, shell, Menu, globalShortcut } = electron;
 
 const express = require("express");
@@ -79,12 +80,23 @@ app.on("ready", function() {
 		});
 
 		if(process.platform === "darwin") {
-			globalShortcut.register("Command+Q", () => {
+			let quit = true;
+
+			localShortcut.register(localWindow,"Command+Q", () => {
+				quit = true;
 				app.quit();
 			});
 			
-			globalShortcut.register("Command+W", () => {
+			localShortcut.register(localWindow,"Command+W", () => {
+				quit = false;
 				app.hide();
+			});
+
+			localWindow.on("close", (e) => {
+				if(!quit) {
+					e.preventDefault();
+					quit = true;
+				}
 			});
 		}
 

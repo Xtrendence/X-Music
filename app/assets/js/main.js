@@ -121,6 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	document.addEventListener("keydown", (e) => {
+		if((e.ctrlKey && e.key.toLowerCase() === "f" || e.metaKey && e.key.toLowerCase() === "f") && !inputSearch.classList.contains("hidden")) {
+			inputSearch.focus();
+		}
+	});
+
 	window.addEventListener("resize", () => {
 		hideMoreMenu();
 		hideMoreMenuPlaylist();

@@ -26,9 +26,9 @@ It should be, yes. On the server-side, there aren't any shell commands or any us
 
 |Platform|Download Link|
 |-------------|------------------|
-|**Mac**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Mac-X-Music-1.0.0.dmg|
-|**Linux**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Linux-X-Music-1.0.0.AppImage|
-|**Windows**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.0/Windows-X-Music.Setup.1.0.0.exe|
+|**Mac**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.1/Mac-X-Music-1.0.1.dmg|
+|**Linux**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.1/Linux-X-Music-1.0.1.AppImage|
+|**Windows**|https://github.com/Xtrendence/X-Music/releases/download/V1.0.1/Windows-X-Music.Setup.1.0.1.exe|
 
 *Please note that on Mac it might say that the application can't be opened because it's from an unidentified developer. To fix this, simply open **System Preferences**, go to **Security & Privacy**, click on the **General** tab, and find the **Open Anyway** button at the bottom of the page.*
 

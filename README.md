@@ -32,4 +32,4 @@ It should be, yes. On the server-side, there aren't any shell commands or any us
 
 *Please note that on Mac it might say that the application can't be opened because it's from an unidentified developer. To fix this, simply open **System Preferences**, go to **Security & Privacy**, click on the **General** tab, and find the **Open Anyway** button at the bottom of the page. This is because I don't have an Apple developer account to sign the app, and they cost $100 a year.*
 
-![X:/Music](https://i.imgur.com/ZzB0vN3.png)
+![X:/Music](https://i.imgur.com/6Y06b5v.png)

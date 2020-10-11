@@ -32,6 +32,7 @@ let defaultSettings = JSON.stringify({
 	allowRemote:true
 });
 
+// Create the directory and files used to store the user's playlists and settings.
 if(!fs.existsSync(dataDirectory)) {
 	fs.mkdirSync(dataDirectory);
 }
@@ -47,21 +48,24 @@ app.name = "X:/Music";
 
 app.on("ready", function() {
 	if(fs.existsSync(settingsFile) && fs.existsSync(playlistsFile)) {
+		// Used to determine whether or not the remote's list of songs or playlists need to be updated.
 		let refreshRemoteSongs = true;
 		let refreshRemotePlaylists = true;
+
+		// Used to determine the current status of the host app (what page is being viewed, what song is being played, and so on).
 		let currentStatus = "";
 
 		let settings = fs.readFileSync(settingsFile, { encoding:"utf-8" });
 		let playlists = fs.readFileSync(playlistsFile, { encoding:"utf-8" });
 
-		const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+		const { screenWidth, screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
 		let windowWidth = 1280;
 		let windowHeight = 720;
 
-		if(width <= 1080 || height <= 620) {
-			windowWidth = width - 100;
-			windowHeight = height - 100;
+		if(screenWidth <= 1080 || screenHeight <= 620) {
+			windowWidth = screenWidth - 100;
+			windowHeight = screenHeight - 100;
 		}
 
 		const localWindow = new BrowserWindow({
@@ -79,6 +83,7 @@ app.on("ready", function() {
 			}
 		});
 
+		// macOS apps behave differently that Windows when it comes to closing an application.
 		if(process.platform === "darwin") {
 			let quit = true;
 
@@ -120,11 +125,14 @@ app.on("ready", function() {
 			if(validJSON(settings)) {
 				let libraryDirectory = JSON.parse(settings).libraryDirectory;
 				if(libraryDirectory !== "") {
+					// Watch the library directory for any file changes so new songs can be added without an actual manual refresh.
 					let watch = fs.watch(libraryDirectory, { recursive:true, persistent:true }, () => {
 						sendInfo(true);
 						localWindow.webContents.send("notify", { title:"Refreshing", description:"Your music library is being updated.", color:"rgb(40,40,40)", duration:5000});
 						refreshRemoteSongs = true;
 					});
+
+					// Get all files with the extensions .mp3, .wav, and .ogg.
 					glob(libraryDirectory + "/**/*.{mp3, wav, ogg}", (error, files) => {
 						if(error) {
 							console.log(error);
@@ -139,6 +147,8 @@ app.on("ready", function() {
 									let artist = data.common.artist;
 									let album = data.common.album;
 									let duration = data.format.duration;
+
+									// To avoid empty fields, if the file doesn't have the appropriate metadata, the file's name is used as the title, and the album and artist are set to "Unknown".
 									if(typeof data.common.title === "undefined" || data.common.title.trim() === "") {
 										title = path.basename(file).split(".").slice(0, -1).join(".");
 									}
@@ -148,7 +158,9 @@ app.on("ready", function() {
 									if(typeof data.common.artist === "undefined" || data.common.artist.trim() === "") {
 										artist = "Unknown Artist";
 									}
+
 									songs.push({ file:file, title:title, artist:artist, album:album, duration:duration });
+
 									count++;
 									if(count === files.length) {
 										localWindow.webContents.send("getSongs", songs);
@@ -187,6 +199,7 @@ app.on("ready", function() {
 			currentStatus = JSON.stringify(req);
 		});
 
+		// Used to allow the user to browse their file system and choose a library directory.
 		ipcMain.on("browseFiles",(error, req) => {
 			let directory = dialog.showOpenDialogSync(localWindow, { title:"Select Music Library Directory", message:"Select the directory that contains your MP3, WAV, or OGG files.", properties:["openDirectory"] });
 			if(typeof directory !== "undefined") {
@@ -550,6 +563,7 @@ app.on("ready", function() {
 			}
 		});
 
+		// Used to synchronize the remote's app with the host.
 		appExpress.get("/checkStatus", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("setStatus");
@@ -557,6 +571,7 @@ app.on("ready", function() {
 			}
 		});
 
+		// Used to synchronize the host's app with the remote.
 		appExpress.post("/setView", (req, res) => {
 			if(remoteCheck()) {
 				localWindow.webContents.send("setView", req.body);

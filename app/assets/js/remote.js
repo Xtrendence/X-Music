@@ -5,9 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	let loop = "none";
 	let volume = 100;
 
+	// How often the remote checks to ensure its list of songs are the same as the host. Default: 450ms.
 	let refreshRateSongs = 450;
+	// How often the remote checks to ensure its status (what song is being played, what page is active etc.) is the same as the host. Default: 200ms.
 	let refreshRateStatus = 200;
 
+	// Suspend syncing the remote's status with the host so that any changes made on the remote have time to take place on the host. Default suspension time is 1.5s. If the remote is delayed or the host doesn't sync up smoothly with it, try playing around with the suspension time. If you set the suspension time to a higher number, you'll most likely get a smoother experience, but actions will be more delayed. This is because, occasionally, the host will update its status at the same time that a command is being sent from the remote, so the remote's action will be overridden by the host. To fix this, the entire sync feature would have to be changed, and sockets would have to be used as HTTP requests weren't made to actively sync two devices up.
 	let suspendSync = false;
 	let suspensionTime = 1500;
 
@@ -379,6 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		showPage("songs");
 	}
 
+	// Used in "passthrough" mode to play songs based on the base64 string sent by the host.
 	function processSong(data) {
 		audioFile.src = "data:" + data.mime + ";base64," + data.base64;
 		audioFile.volume = volume / 100;

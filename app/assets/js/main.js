@@ -370,6 +370,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		hideChoosePlaylistMenu();
 	});
 
+	divListview.addEventListener("scroll", () => {
+		if(!divMoreMenu.classList.contains("hidden")) {
+			hideMoreMenu();
+		}
+	});
+
 	ipcRenderer.on("setStatus", (error, res) => {
 		let playing = false;
 		if(svgPlay.classList.contains("hidden")) {
@@ -767,7 +773,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function showMoreMenu(element, index) {
-		divMoreMenu.style.top = element.offsetTop + 49 + "px";
+		let viewportOffset = element.getBoundingClientRect();
+		divMoreMenu.style.top = viewportOffset.top + 10 + "px";
 		divMoreMenu.classList.remove("hidden");
 		divMoreMenu.setAttribute("data-index", index);
 	}
